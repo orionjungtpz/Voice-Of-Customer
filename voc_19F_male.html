@@ -306,7 +306,7 @@ async function submitForm(){
           location: LOC,
           category: finalCat,
           title: finalCat,
-          content: content||finalCat,
+          content: needText ? content : '',
           email: document.getElementById('fbEmail').value.trim() || '익명',
           phone: '익명',
           isAnonymous: !document.getElementById('fbEmail').value.trim(),
