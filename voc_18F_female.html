@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>고객의 소리</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--primary:#003087;--accent:#0055c8;--light:#e8f0fb;--text:#1a1a2e;--muted:#6b7280;--border:#e0e7f3;--bg:#f5f7fc;--card:#fff;--shadow:0 4px 24px rgba(0,48,135,0.10);}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
+.page{position:fixed;inset:0;overflow-y:auto;padding-bottom:56px;background:var(--bg);transition:transform .35s cubic-bezier(.4,0,.2,1),opacity .35s ease;}
+.page.hidden{transform:translateX(100%);opacity:0;pointer-events:none;}
+.header{background:var(--primary);padding:20px 20px 32px;position:relative;overflow:hidden;}
+.header::after{content:'';position:absolute;bottom:-18px;left:0;right:0;height:36px;background:var(--bg);border-radius:50% 50% 0 0/100% 100% 0 0;}
+.header-inner{display:flex;align-items:center;gap:12px;position:relative;z-index:1;}
+.header-icon{width:44px;height:44px;background:rgba(255,255,255,.15);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;}
+.back-btn{width:34px;height:34px;background:rgba(255,255,255,.15);border-radius:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;flex-shrink:0;border:none;color:#fff;}
+.header h1{color:#fff;font-size:20px;font-weight:700;}
+.header p{color:rgba(255,255,255,.75);font-size:12px;margin-top:2px;font-weight:300;}
+.notice-card{margin:28px 16px 0;background:#fff;border-radius:16px;padding:20px;box-shadow:var(--shadow);}
+.notice-text{font-size:13px;color:var(--muted);line-height:1.8;border-left:3px solid var(--accent);padding-left:12px;}
+.info-list{margin:16px 0 0;}
+.info-item{display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);}
+.info-item:last-child{border-bottom:none;padding-bottom:0;}
+.info-icon{width:34px;height:34px;border-radius:10px;background:var(--light);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.info-item strong{display:block;font-size:13px;font-weight:700;margin-bottom:2px;}
+.info-item span{font-size:12px;color:var(--muted);}
+.start-btn{display:block;width:calc(100% - 32px);margin:20px 16px 0;padding:17px;background:var(--primary);color:#fff;border:none;border-radius:14px;font-family:'Noto Sans KR',sans-serif;font-size:16px;font-weight:700;cursor:pointer;text-align:center;box-shadow:0 4px 16px rgba(0,48,135,.25);}
+.card{background:var(--card);margin:16px;border-radius:16px;box-shadow:var(--shadow);padding:20px;}
+.section-title{font-size:13px;font-weight:700;color:var(--primary);letter-spacing:.3px;margin-bottom:14px;display:flex;align-items:center;gap:6px;}
+.section-title::before{content:'';display:block;width:3px;height:14px;background:var(--accent);border-radius:2px;}
+.chip-group{display:flex;gap:10px;flex-wrap:wrap;}
+.chip{display:flex;align-items:center;gap:7px;padding:11px 16px;border:1.5px solid var(--border);border-radius:50px;cursor:pointer;font-size:14px;font-weight:500;color:var(--muted);background:#fff;transition:all .18s;user-select:none;}
+.chip:hover{border-color:var(--accent);color:var(--accent);}
+.chip.selected{border-color:var(--accent);background:var(--light);color:var(--accent);font-weight:700;}
+.sub-row{margin-top:14px;padding-top:14px;border-top:1px dashed var(--border);}
+.breadcrumb{font-size:11px;color:var(--muted);margin-bottom:10px;display:flex;align-items:center;gap:5px;flex-wrap:wrap;}
+.breadcrumb b{color:var(--accent);}
+.summary-box{margin-top:14px;background:var(--light);border-radius:10px;padding:10px 14px;font-size:13px;color:var(--accent);font-weight:600;display:none;}
+.field label{display:block;font-size:13px;font-weight:600;color:var(--text);margin-bottom:7px;}
+.req{color:#e74c3c;margin-left:3px;}
+textarea{width:100%;padding:14px;border:1.5px solid var(--border);border-radius:10px;font-family:'Noto Sans KR',sans-serif;font-size:14px;color:var(--text);background:#fafbfe;transition:border-color .18s;-webkit-appearance:none;outline:none;resize:vertical;min-height:140px;line-height:1.8;}
+textarea:focus{border-color:var(--accent);background:#fff;}
+.char-count{text-align:right;font-size:11px;color:var(--muted);margin-top:6px;}
+.submit-btn{width:calc(100% - 32px);margin:0 16px;padding:17px;background:var(--primary);color:#fff;border:none;border-radius:14px;font-family:'Noto Sans KR',sans-serif;font-size:16px;font-weight:700;cursor:pointer;box-shadow:0 4px 16px rgba(0,48,135,.25);}
+.submit-btn:disabled{background:#9ca3af;box-shadow:none;cursor:not-allowed;}
+.privacy-note{text-align:center;font-size:11px;color:var(--muted);margin:14px 16px 0;line-height:1.7;}
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;align-items:center;justify-content:center;padding:24px;}
+.overlay.show{display:flex;}
+.success-card{background:#fff;border-radius:20px;padding:36px 28px;text-align:center;width:100%;max-width:360px;animation:popIn .3s cubic-bezier(.34,1.56,.64,1);}
+.success-emoji{font-size:52px;margin-bottom:14px;}
+.success-card h2{font-size:20px;font-weight:700;color:var(--primary);margin-bottom:10px;}
+.success-card p{font-size:14px;color:var(--muted);line-height:1.7;}
+.receipt-box{margin-top:16px;background:var(--light);border-radius:12px;padding:14px;}
+.receipt-num{font-size:18px;font-weight:700;color:var(--accent);letter-spacing:1px;}
+.receipt-desc{font-size:11px;color:var(--muted);margin-top:4px;}
+.success-close{margin-top:22px;width:100%;padding:13px;background:var(--primary);color:#fff;border:none;border-radius:12px;font-family:'Noto Sans KR',sans-serif;font-size:15px;font-weight:600;cursor:pointer;}
+@keyframes popIn{from{transform:scale(.8);opacity:0}to{transform:scale(1);opacity:1}}
+</style>
+</head>
+<body>
+
+<div class="page" id="page2">
+  <div class="header">
+    <div class="header-inner">
+      <div><h1>포스코인터내셔널 시설물 VoC 접수</h1><p id="loc2">📍 포스코타워-송도 18층 여자화장실</p></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="section-title">접수 유형</div>
+
+    <!-- 1단계 -->
+    <div class="chip-group" id="g1"></div>
+
+    <!-- 2단계 -->
+    <div id="w2" style="display:none">
+      <div class="sub-row">
+        <div class="breadcrumb" id="b2"></div>
+        <div class="chip-group" id="g2"></div>
+      </div>
+    </div>
+
+    <!-- 3단계 -->
+    <div id="w3" style="display:none">
+      <div class="sub-row">
+        <div class="breadcrumb" id="b3"></div>
+        <div class="chip-group" id="g3"></div>
+      </div>
+    </div>
+
+    <!-- 선택 완료 요약 -->
+    <div class="summary-box" id="summaryBox"></div>
+  </div>
+
+
+  <!-- 피드백 수신 카드 -->
+  <div class="card" id="feedbackCard">
+    <div class="section-title"><span id="txt-fb-section">피드백 결과 확인</span> <span style="font-size:11px;font-weight:400;color:var(--muted);margin-left:4px" id="txt-fb-section-sub">선택사항</span></div>
+    <div style="display:flex;align-items:center;gap:12px;">
+      <span style="font-size:22px;flex-shrink:0;">📩</span>
+      <input type="email" id="fbEmail" placeholder="이메일 주소 입력" autocomplete="email"
+        style="flex:1;padding:12px 14px;border:1.5px solid var(--border);border-radius:10px;font-family:'Noto Sans KR',sans-serif;font-size:14px;color:var(--text);background:#fafbfe;outline:none;">
+    </div>
+    <div id="txt-fb-hint" style="font-size:11px;color:var(--muted);margin-top:8px;">💡 담당자에게는 노출되지 않으며, 조치 완료 알림 발송에만 사용됩니다.</div>
+  </div>
+
+  <!-- 기타 내용 입력 -->
+  <div class="card" id="contentCard" style="display:none">
+    <div class="section-title">의견 내용</div>
+    <div class="field">
+      <label>내용 <span class="req">*</span></label>
+      <textarea id="vocContent" placeholder="불편하셨던 점이나 개선이 필요한 내용을 자유롭게 작성해 주세요." maxlength="1000"
+        oninput="document.getElementById('cc').textContent=this.value.length"></textarea>
+      <div class="char-count"><span id="cc">0</span> / 1000</div>
+    </div>
+  </div>
+
+  <button class="submit-btn" id="submitBtn" onclick="submitForm()">📤 익명으로 접수하기</button>
+  <p class="privacy-note">본 시스템은 POSCO International 내부 업무 개선을 위해 운영됩니다.<br>개인정보는 수집하지 않습니다.</p>
+</div>
+
+<div class="overlay" id="doneOverlay">
+  <div class="success-card">
+    <div class="success-emoji">✅</div>
+    <h2>접수 완료!</h2>
+    <p>의견을 보내주셔서 감사합니다.<br>담당자가 신속히 검토하겠습니다.</p>
+    <div class="receipt-box">
+      <div class="receipt-num" id="receiptNum"></div>
+      <div class="receipt-desc">📌 접수번호를 기록해 두시면 확인에 도움이 됩니다</div>
+    </div>
+    <button class="success-close" onclick="closeSuccess()">확인</button>
+  </div>
+</div>
+
+<script>
+const PA_URL = 'https://defaultb9501effd05e4bf18a87898d83f46c.eb.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/9a0a5c605bc745a9a3f4a8e954671f39/triggers/manual/paths/invoke?api-version=1';
+
+// ════════════════════════════════════════════════════════
+// ★ 접수 유형 트리 — 여기서 수정하세요 ★
+// children : 2단계 항목
+// sub      : 3단계 항목 (비데/변기클리너 등)
+// isOther  : true면 기타 내용 입력창 표시
+// ════════════════════════════════════════════════════════
+const TREE = {
+  // ★ 남자화장실
+  male: [
+    { value:'소변기', icon:'🚹', label:'소변기',
+      children:[
+        { value:'소변기 > 막힘', icon:'🪠', label:'막힘' },
+        { value:'소변기 > 냄새', icon:'💨', label:'냄새' },
+        { value:'소변기 > 기타', icon:'💬', label:'기타', isOther:true },
+      ]
+    },
+    { value:'좌변기', icon:'🚽', label:'좌변기',
+      children:[
+        { value:'좌변기 > 막힘', icon:'🪠', label:'막힘' },
+        { value:'비데', icon:'💦', label:'비데',
+          sub:[
+            { value:'좌변기 > 비데 > 누수',        icon:'💧', label:'누수' },
+            { value:'좌변기 > 비데 > 물이 안나옴',  icon:'❌', label:'물이 안나옴' },
+            { value:'좌변기 > 비데 > 기타',         icon:'💬', label:'기타', isOther:true },
+          ]
+        },
+        { value:'변기클리너', icon:'🧴', label:'변기클리너',
+          sub:[
+            { value:'좌변기 > 변기클리너 > 누수',     icon:'💧', label:'누수' },
+            { value:'좌변기 > 변기클리너 > 용액 부족', icon:'❌', label:'용액 부족' },
+            { value:'좌변기 > 변기클리너 > 기타',      icon:'💬', label:'기타', isOther:true },
+          ]
+        },
+        { value:'좌변기 > 기타', icon:'💬', label:'기타', isOther:true },
+      ]
+    },
+    { value:'기타', icon:'💬', label:'기타', isOther:true },
+  ],
+  // ★ 여자화장실
+  female: [
+    { value:'좌변기', icon:'🚽', label:'좌변기',
+      children:[
+        { value:'좌변기 > 막힘', icon:'🪠', label:'막힘' },
+        { value:'비데', icon:'💦', label:'비데',
+          sub:[
+            { value:'좌변기 > 비데 > 누수',        icon:'💧', label:'누수' },
+            { value:'좌변기 > 비데 > 물이 안나옴',  icon:'❌', label:'물이 안나옴' },
+            { value:'좌변기 > 비데 > 기타',         icon:'💬', label:'기타', isOther:true },
+          ]
+        },
+        { value:'변기클리너', icon:'🧴', label:'변기클리너',
+          sub:[
+            { value:'좌변기 > 변기클리너 > 누수',     icon:'💧', label:'누수' },
+            { value:'좌변기 > 변기클리너 > 용액 부족', icon:'❌', label:'용액 부족' },
+            { value:'좌변기 > 변기클리너 > 기타',      icon:'💬', label:'기타', isOther:true },
+          ]
+        },
+        { value:'좌변기 > 기타', icon:'💬', label:'기타', isOther:true },
+      ]
+    },
+    { value:'기타', icon:'💬', label:'기타', isOther:true },
+  ],
+};
+TREE.default = TREE.male;
+
+// 위치 (하드코딩)
+const _floor = '18';
+const _gender = 'female';
+const LOC = '포스코타워-송도 18층 여자화장실';
+document.getElementById('loc2').textContent = '📍 포스코타워-송도 18층 여자화장실';
+const gKey = () => 'female'; // 기본값 male
+
+// 상태
+let finalCat='', s1=null, s2=null, needText=false;
+
+// 유틸
+function chips(gid, items, fn) {
+  document.getElementById(gid).innerHTML = items.map(it =>
+    `<div class="chip" data-v="${it.value}" onclick="${fn}(this)"><span>${it.icon}</span> ${it.label}</div>`
+  ).join('');
+}
+function deselect(gid) { document.querySelectorAll('#'+gid+' .chip').forEach(c=>c.classList.remove('selected')); }
+function crumb(bid, parts) {
+  document.getElementById(bid).innerHTML = parts.map((p,i)=> i===0?`<b>${p}</b>`:`<span>›</span><b>${p}</b>`).join('');
+}
+function summary(txt) { const el=document.getElementById('summaryBox'); el.textContent='✅ '+txt; el.style.display='block'; }
+function clearSummary() { document.getElementById('summaryBox').style.display='none'; }
+function setContent(show) {
+  needText=show;
+  document.getElementById('contentCard').style.display=show?'block':'none';
+  if(!show){document.getElementById('vocContent').value='';document.getElementById('cc').textContent='0';}
+}
+
+// 초기화
+function initForm() {
+  chips('g1', TREE[gKey()], 'c1');
+  document.getElementById('w2').style.display='none';
+  document.getElementById('w3').style.display='none';
+  setContent(false); clearSummary();
+  finalCat=''; s1=null; s2=null;
+}
+initForm();
+
+// 1단계
+function c1(el) {
+  deselect('g1'); el.classList.add('selected');
+  document.getElementById('w2').style.display='none';
+  document.getElementById('w3').style.display='none';
+  setContent(false); clearSummary();
+  finalCat=''; s1=null; s2=null;
+  s1 = TREE[gKey()].find(i=>i.value===el.dataset.v);
+  if(!s1) return;
+  if(s1.children) {
+    chips('g2', s1.children, 'c2');
+    crumb('b2', [s1.label]);
+    document.getElementById('w2').style.display='block';
+  } else if(s1.isOther) { finalCat=s1.value; setContent(true); summary(s1.label); }
+  else { finalCat=s1.value; summary(s1.label); }
+}
+
+// 2단계
+function c2(el) {
+  deselect('g2'); el.classList.add('selected');
+  document.getElementById('w3').style.display='none';
+  setContent(false); clearSummary();
+  finalCat=''; s2=null;
+  s2 = s1.children.find(i=>i.value===el.dataset.v);
+  if(!s2) return;
+  if(s2.sub) {
+    chips('g3', s2.sub, 'c3');
+    crumb('b3', [s1.label, s2.label]);
+    document.getElementById('w3').style.display='block';
+  } else if(s2.isOther) { finalCat=s2.value; setContent(true); summary(s1.label+' › '+s2.label); }
+  else { finalCat=s2.value; summary(s1.label+' › '+s2.label); }
+}
+
+// 3단계
+function c3(el) {
+  deselect('g3'); el.classList.add('selected');
+  setContent(false); clearSummary();
+  const item = s2.sub.find(i=>i.value===el.dataset.v);
+  if(!item) return;
+  finalCat = item.value;
+  if(item.isOther) setContent(true);
+  summary(s1.label+' › '+s2.label+' › '+item.label);
+}
+
+// 페이지
+function goPage2(){document.getElementById('page1').classList.add('slide-back');const p=document.getElementById('page2');p.classList.remove('hidden');p.scrollTop=0;}
+function goPage1(){document.getElementById('page1').classList.remove('slide-back');document.getElementById('page2').classList.add('hidden');}
+
+// 접수
+function genReceipt(){const n=new Date();return`VOC-${n.getFullYear()}${String(n.getMonth()+1).padStart(2,'0')}${String(n.getDate()).padStart(2,'0')}-${String(Math.floor(Math.random()*90000)+10000)}`;}
+
+async function submitForm(){
+  if(!finalCat){alert('접수 유형을 선택해 주세요.');return;}
+  const content=document.getElementById('vocContent').value.trim();
+  if(needText && !content){alert('기타 내용을 입력해 주세요.');return;}
+
+  const btn=document.getElementById('submitBtn');
+  btn.disabled=true;btn.textContent='⏳ 접수 중...';
+  try{
+    const receiptNum=genReceipt();
+    const payload = {
+          receiptNum,
+          submittedAt: new Date().toLocaleString('ko-KR',{timeZone:'Asia/Seoul'}),
+          location: LOC,
+          category: finalCat,
+          title: finalCat,
+          content: content||finalCat,
+          email: document.getElementById('fbEmail').value.trim() || '익명',
+          phone: '익명',
+          isAnonymous: !document.getElementById('fbEmail').value.trim(),
+          wantFeedback: !!document.getElementById('fbEmail').value.trim(),
+          attachments: []
+        };
+    // 완료 화면 먼저 표시 (사용자 경험 우선)
+    document.getElementById('receiptNum').textContent=receiptNum;
+    document.getElementById('doneOverlay').classList.add('show');
+    // 백그라운드로 PA 전송 (실패해도 사용자에게 영향 없음)
+    if(PA_URL && PA_URL !== 'YOUR_POWER_AUTOMATE_HTTP_TRIGGER_URL') {
+      fetch(PA_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)})
+        .then(res=>{ if(!res.ok && res.status!==202) console.warn('[VOC] 전송 실패:', res.status); })
+        .catch(err=>console.warn('[VOC] 전송 오류:', err));
+    } else {
+      console.log('[VOC 테스트]', payload);
+    }
+  }catch{alert('접수 중 오류가 발생했습니다.\n잠시 후 다시 시도해 주세요.');}
+  finally{btn.disabled=false;btn.textContent='📤 익명으로 접수하기';}
+}
+
+function closeSuccess(){
+  document.getElementById('doneOverlay').classList.remove('show');
+  document.getElementById('fbEmail').value = '';
+  initForm();
+}
+</script>
+</body>
+</html>
