@@ -137,15 +137,55 @@ td:first-child{text-align:left;padding-left:14px;font-weight:600;}
   <!-- 페이지 1: 점검자 선택 -->
   <div id="page1">
     <div class="page-body">
-      <div class="sec-label" style="margin-bottom:16px;">점검자를 선택해주세요</div>
+      <!-- 에디터 패널 (기본 숨김) -->
+      <div id="editor-panel" style="display:none;background:#f0f4fb;border:1.5px solid var(--border);border-radius:14px;padding:16px;margin-bottom:20px;">
+        <div style="font-size:12px;font-weight:700;color:var(--primary);margin-bottom:12px;">🎨 이미지 설정</div>
+        <div style="margin-bottom:10px;">
+          <div style="font-size:11px;color:var(--muted);margin-bottom:6px;">배경 이미지</div>
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+            <div style="width:48px;height:48px;border-radius:8px;border:2px dashed var(--border);overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:20px;background:#fff;" id="bg-thumb">🖼️</div>
+            <span style="font-size:12px;color:var(--primary);font-weight:600;">사진 선택</span>
+            <input type="file" accept="image/*" style="display:none" onchange="setImg('bg',this)">
+          </label>
+        </div>
+        <div style="margin-bottom:10px;">
+          <div style="font-size:11px;color:var(--muted);margin-bottom:6px;">오세림 프로필 사진</div>
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+            <div style="width:48px;height:48px;border-radius:50%;border:2px dashed var(--border);overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:20px;background:#fff;" id="p1-thumb">👩</div>
+            <span style="font-size:12px;color:var(--primary);font-weight:600;">사진 선택</span>
+            <input type="file" accept="image/*" style="display:none" onchange="setImg('p1',this)">
+          </label>
+        </div>
+        <div style="margin-bottom:14px;">
+          <div style="font-size:11px;color:var(--muted);margin-bottom:6px;">전승리 프로필 사진</div>
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+            <div style="width:48px;height:48px;border-radius:50%;border:2px dashed var(--border);overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:20px;background:#fff;" id="p2-thumb">👩</div>
+            <span style="font-size:12px;color:var(--primary);font-weight:600;">사진 선택</span>
+            <input type="file" accept="image/*" style="display:none" onchange="setImg('p2',this)">
+          </label>
+        </div>
+        <button onclick="saveImgs()" style="width:100%;padding:10px;background:var(--primary);color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">💾 적용 및 저장</button>
+        <button onclick="document.getElementById('editor-panel').style.display='none'" style="width:100%;padding:8px;background:transparent;color:var(--muted);border:none;font-size:12px;cursor:pointer;margin-top:6px;font-family:inherit;">닫기</button>
+      </div>
+
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+        <div class="sec-label" style="margin-bottom:0;">점검자를 선택해주세요</div>
+        <button onclick="adminAuth()" style="font-size:11px;color:var(--muted);background:transparent;border:1px solid var(--border);border-radius:6px;padding:4px 10px;cursor:pointer;font-family:inherit;">⚙️ 이미지 설정</button>
+      </div>
       <div class="inspector-grid">
         <div class="ins-card" onclick="selectInspector('오세림',this)">
-          <div class="ins-avatar">👩</div>
+          <div class="ins-avatar" id="avatar-p1" style="overflow:hidden;padding:0;">
+            <img id="img-p1" src="" alt="👩" style="width:100%;height:100%;object-fit:cover;display:none;">
+            <span id="emoji-p1">👩</span>
+          </div>
           <div class="ins-name">오세림</div>
           <div class="ins-role">시설 점검</div>
         </div>
         <div class="ins-card" onclick="selectInspector('전승리',this)">
-          <div class="ins-avatar">👩</div>
+          <div class="ins-avatar" id="avatar-p2" style="overflow:hidden;padding:0;">
+            <img id="img-p2" src="" alt="👩" style="width:100%;height:100%;object-fit:cover;display:none;">
+            <span id="emoji-p2">👩</span>
+          </div>
           <div class="ins-name">전승리</div>
           <div class="ins-role">시설 점검</div>
         </div>
@@ -250,10 +290,96 @@ const ROOMS = [
 let inspector = '';
 let state = {};
 
+// ── 관리자 인증 ──────────────────────────────────────
+const ADMIN_PW = '3692'; // 비밀번호 변경 가능
+
+function adminAuth() {
+  const pw = prompt('관리자 비밀번호를 입력하세요.');
+  if(pw === null) return;
+  if(pw === ADMIN_PW) {
+    const panel = document.getElementById('editor-panel');
+    panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+  } else {
+    alert('비밀번호가 올바르지 않습니다.');
+  }
+}
+
+// ── 이미지 설정 ──────────────────────────────────────
+const imgStore = {};
+
+function setImg(key, input) {
+  if(!input.files[0]) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    imgStore[key] = e.target.result;
+    // 썸네일 미리보기
+    const thumb = document.getElementById(key+'-thumb');
+    if(thumb) {
+      thumb.innerHTML = '';
+      const img = document.createElement('img');
+      img.src = e.target.result;
+      img.style.cssText = 'width:100%;height:100%;object-fit:cover;';
+      thumb.appendChild(img);
+    }
+    // 실시간 적용
+    if(key === 'p1') applyAvatar('p1', e.target.result);
+    if(key === 'p2') applyAvatar('p2', e.target.result);
+    if(key === 'bg') applyBg(e.target.result);
+  };
+  reader.readAsDataURL(input.files[0]);
+}
+
+function applyAvatar(key, src) {
+  const img = document.getElementById('img-'+key);
+  const emoji = document.getElementById('emoji-'+key);
+  if(img && emoji) {
+    img.src = src;
+    img.style.display = 'block';
+    emoji.style.display = 'none';
+  }
+}
+
+function applyBg(src) {
+  document.getElementById('page1').style.backgroundImage = `url('${src}')`;
+  document.getElementById('page1').style.backgroundSize = 'cover';
+  document.getElementById('page1').style.backgroundPosition = 'center';
+}
+
+function saveImgs() {
+  // localStorage에 저장 (다음 방문 시 유지)
+  try {
+    if(imgStore.p1) localStorage.setItem('voc_p1', imgStore.p1);
+    if(imgStore.p2) localStorage.setItem('voc_p2', imgStore.p2);
+    if(imgStore.bg) localStorage.setItem('voc_bg', imgStore.bg);
+  } catch(e) {}
+  document.getElementById('editor-panel').style.display = 'none';
+  showToast('✅ 이미지가 적용되었습니다');
+}
+
+function loadSavedImgs() {
+  try {
+    const p1 = localStorage.getItem('voc_p1');
+    const p2 = localStorage.getItem('voc_p2');
+    const bg = localStorage.getItem('voc_bg');
+    if(p1){ imgStore.p1=p1; applyAvatar('p1',p1); const t=document.getElementById('p1-thumb'); if(t){t.innerHTML='';const i=document.createElement('img');i.src=p1;i.style.cssText='width:100%;height:100%;object-fit:cover;';t.appendChild(i);} }
+    if(p2){ imgStore.p2=p2; applyAvatar('p2',p2); const t=document.getElementById('p2-thumb'); if(t){t.innerHTML='';const i=document.createElement('img');i.src=p2;i.style.cssText='width:100%;height:100%;object-fit:cover;';t.appendChild(i);} }
+    if(bg){ imgStore.bg=bg; applyBg(bg); const t=document.getElementById('bg-thumb'); if(t){t.innerHTML='';const i=document.createElement('img');i.src=bg;i.style.cssText='width:100%;height:100%;object-fit:cover;';t.appendChild(i);} }
+  } catch(e) {}
+}
+
+function showToast(msg) {
+  let t = document.getElementById('img-toast');
+  if(!t){ t=document.createElement('div'); t.id='img-toast'; t.style.cssText='position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#1a2340;color:#fff;padding:10px 20px;border-radius:24px;font-size:13px;z-index:999;white-space:nowrap;'; document.body.appendChild(t); }
+  t.textContent = msg;
+  t.style.opacity = '1';
+  setTimeout(()=>{ t.style.opacity='0'; }, 2000);
+}
+
 window.onload = () => {
   const now = new Date();
   const dateStr = now.toLocaleString('ko-KR',{year:'numeric',month:'long',day:'numeric',hour:'2-digit',minute:'2-digit'});
   document.getElementById('today-date').textContent = dateStr;
+  loadSavedImgs();
 };
 
 function selectInspector(name, el) {
