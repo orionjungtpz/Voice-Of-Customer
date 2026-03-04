@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>비즈니스라운지 체크리스트 | 포스코인터내셔널</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+/* 스플래시 */
+.splash{position:fixed;inset:0;background:var(--primary);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;transition:opacity .6s ease;padding:40px;}
+.splash.fade-out{opacity:0;pointer-events:none;}
+.splash-bg{position:absolute;inset:0;background-size:cover;background-position:center;opacity:0;}
+.splash-bg::after{content:'';position:absolute;inset:0;background:rgba(0,0,51,.45);}
+.splash-logo{font-size:58px;margin-bottom:20px;animation:pop 3s ease forwards;}
+.splash-title{color:#fff;font-size:28px;font-weight:700;text-align:center;line-height:1.3;margin-bottom:8px;animation:fadeUp 3s ease both;letter-spacing:-0.5px;white-space:nowrap;}
+.splash-sub{color:rgba(255,255,255,.7);font-size:13px;text-align:center;animation:fadeUp 3s ease .15s both;}
+.splash-bar-wrap{position:absolute;bottom:0;left:0;right:0;height:3px;background:rgba(255,255,255,.2);}
+.splash-bar{height:100%;background:#fff;width:0;animation:load 2.8s ease forwards;}
+.splash-bg.loaded{animation:bgFadeIn .8s ease forwards;}
+@keyframes bgFadeIn{0%{opacity:0;}100%{opacity:1;}}
+@keyframes pop{0%{transform:scale(.5);opacity:0;}20%{transform:scale(1);opacity:1;}90%{transform:scale(1);opacity:1;}100%{transform:scale(1);opacity:1;}}
+@keyframes fadeUp{0%{transform:translateY(16px);opacity:0;}100%{transform:translateY(0);opacity:1;}}
+@keyframes load{0%{width:0;}100%{width:100%;}}
+
+/* BG-INLINE */
+:root{
+  --primary:#003087;--primary-light:#0055c8;--bg:#f0f4fb;--card:#fff;
+  --border:#dde5f4;--text:#1a2340;--muted:#6b7280;--ok:#22c55e;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif;background:var(--bg);color:var(--text);}
+.app{max-width:700px;margin:0 auto;min-height:100vh;background:var(--card);display:flex;flex-direction:column;}
+
+/* 헤더 */
+.header{background:var(--primary);padding:18px 20px 22px;}
+.header h1{color:#fff;font-size:18px;font-weight:700;}
+.header p{color:rgba(255,255,255,.7);font-size:11px;margin-top:3px;}
+
+/* ── 페이지 1: 점검자 선택 ── */
+#page1{flex:1;display:flex;flex-direction:column;}
+#page2{flex:1;display:none;flex-direction:column;}
+
+.page-body{flex:1;padding:24px 20px;}
+.page1-text{color:var(--text);transition:color .3s;}
+.page1-text-muted{color:var(--muted);transition:color .3s;}
+
+.sec-label{font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;margin-bottom:12px;}
+
+/* 점검자 카드 */
+.inspector-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:28px;}
+.ins-card{border:2px solid rgba(255,255,255,.3);border-radius:16px;padding:24px 16px;text-align:center;cursor:pointer;transition:all .2s;background:rgba(255,255,255,.15);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);}
+.ins-card:hover{border-color:rgba(255,255,255,.6);background:rgba(255,255,255,.25);}
+.ins-card.selected{border-color:rgba(255,255,255,.9);background:rgba(255,255,255,.35);}
+.ins-avatar{width:56px;height:56px;border-radius:50%;background:#e8f0fb;color:var(--primary);font-size:24px;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;}
+.ins-card.selected .ins-avatar{background:rgba(255,255,255,.9);color:var(--primary);}
+.ins-name{font-size:15px;font-weight:700;}
+.ins-role{font-size:11px;color:var(--muted);margin-top:3px;}
+
+/* 날짜 카드 */
+.date-card{background:rgba(255,255,255,.15);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.3);border-radius:12px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;}
+.date-card .label{font-size:12px;color:inherit;}
+.date-card .val{font-size:13px;font-weight:700;color:inherit;}
+
+/* 하단 버튼 */
+.btn-bar{padding:16px 20px;border-top:1px solid var(--border);}
+.btn-primary{width:100%;padding:14px;background:var(--primary);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;transition:background .15s;}
+.btn-primary:hover{background:var(--primary-light);}
+.btn-primary:disabled{background:#9ca3af;cursor:not-allowed;}
+.btn-secondary{width:100%;padding:12px;background:transparent;color:var(--primary);border:2px solid var(--primary);border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:8px;}
+
+/* ── 페이지 2: 체크리스트 ── */
+.page2-header{background:#f8faff;border-bottom:1px solid var(--border);padding:12px 16px;display:flex;align-items:center;gap:10px;}
+.page2-header .info-pill{background:var(--primary);color:#fff;font-size:11px;font-weight:700;padding:4px 12px;border-radius:20px;}
+.page2-header .date-pill{font-size:11px;color:var(--muted);margin-left:auto;}
+
+.table-wrap{overflow-x:auto;flex:1;}
+table{width:100%;border-collapse:collapse;min-width:560px;}
+thead th{background:var(--primary);color:#fff;font-size:11px;font-weight:700;padding:10px 6px;text-align:center;white-space:nowrap;position:sticky;top:0;z-index:10;}
+thead th:first-child{text-align:left;padding-left:14px;min-width:100px;}
+thead th:last-child{min-width:120px;}
+
+tbody tr.group-row td{background:#e8f0fb;font-size:11px;font-weight:700;color:var(--primary);padding:6px 14px;}
+tbody tr:not(.group-row):hover{background:#fafcff;}
+td{padding:7px 5px;border-bottom:1px solid var(--border);font-size:12px;text-align:center;vertical-align:middle;}
+td:first-child{text-align:left;padding-left:14px;font-weight:600;}
+
+.chk-cell{display:flex;align-items:center;justify-content:center;}
+.chk{width:28px;height:28px;border-radius:7px;border:2px solid var(--border);background:var(--card);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;transition:all .15s;color:transparent;user-select:none;}
+.chk.checked{background:#dcfce7;border-color:var(--ok);color:var(--ok);}
+
+.seat-val{font-weight:700;color:var(--primary);font-size:13px;}
+
+.note-td input{width:100%;border:1.5px solid var(--border);border-radius:6px;padding:4px 7px;font-size:11px;font-family:inherit;color:var(--text);background:#fafbff;}
+.note-td input:focus{outline:none;border-color:var(--primary);}
+
+/* 요약바 */
+.summary-bar{position:sticky;bottom:0;background:var(--card);border-top:2px solid var(--border);padding:12px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+.sum-badge{display:flex;align-items:center;gap:5px;font-size:12px;font-weight:700;}
+.dot{width:9px;height:9px;border-radius:50%;}
+.submit-btn{margin-left:auto;padding:10px 24px;background:var(--primary);color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;}
+
+/* 완료 오버레이 */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:200;opacity:0;pointer-events:none;transition:opacity .3s;}
+.overlay.show{opacity:1;pointer-events:all;}
+.modal{background:var(--card);border-radius:20px;padding:32px 24px;text-align:center;max-width:320px;width:90%;}
+.modal .icon{font-size:52px;margin-bottom:12px;}
+.modal h2{font-size:20px;font-weight:700;color:var(--primary);margin-bottom:6px;}
+.modal p{font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:16px;}
+.modal-info{background:#f0f4fb;border-radius:10px;padding:12px;text-align:left;margin-bottom:16px;}
+.mir{display:flex;justify-content:space-between;font-size:12px;padding:4px 0;border-bottom:1px solid var(--border);}
+.mir:last-child{border-bottom:none;}
+.mir .l{color:var(--muted);}
+.mir .r{font-weight:700;}
+.modal-btn{width:100%;padding:12px;background:var(--primary);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;}
+
+.note-td{min-width:160px;}
+.note-td-inner{display:flex;align-items:center;gap:4px;flex-wrap:nowrap;}
+.note-td input{flex:1;min-width:0;border:1.5px solid var(--border);border-radius:6px;padding:4px 7px;font-size:11px;font-family:inherit;color:var(--text);background:#fafbff;}
+.note-td input:focus{outline:none;border-color:var(--primary);}
+.note-td input.required-warn{border-color:#ef4444;background:#fff5f5;}
+.photo-btn{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;cursor:pointer;font-size:15px;flex-shrink:0;}
+.photo-preview{display:flex;flex-wrap:wrap;gap:3px;margin-top:3px;}
+.photo-thumb{width:36px;height:36px;object-fit:cover;border-radius:4px;border:1px solid var(--border);cursor:pointer;}
+@media(max-width:600px){
+  .table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+  table{min-width:480px;font-size:11px;}
+  thead th{padding:7px 4px;font-size:10px;}
+  td{padding:5px 3px;font-size:11px;}
+  td:first-child{padding-left:8px;font-size:11px;}
+  .chk{width:24px;height:24px;font-size:13px;}
+  .seat-val{font-size:11px;}
+  .note-td{min-width:100px;}
+  .note-td input{font-size:10px;padding:3px 5px;}
+  .photo-btn{font-size:13px;width:22px;height:22px;}
+  .photo-thumb{width:28px;height:28px;}
+  .header h1{font-size:15px;}
+  .page2-header{flex-wrap:wrap;gap:6px;}
+  .info-pill{font-size:10px;}
+  .date-pill{font-size:10px;}
+  .ins-card{padding:16px 10px;}
+  .ins-avatar{width:44px;height:44px;font-size:20px;}
+  .ins-name{font-size:13px;}
+  .modal{padding:24px 16px;}
+}
+.footer-note{text-align:center;font-size:11px;color:var(--muted);padding:14px 20px;line-height:1.7;}
+</style>
+</head>
+<body>
+<!-- 스플래시 -->
+<div class="splash" id="splash">
+  <div class="splash-bg" id="splash-bg"></div>
+  <div class="splash-logo">
+    <img id="splash-logo-img" src="" style="width:86px;height:86px;object-fit:contain;display:none;border-radius:14px;">
+  </div>
+  <div class="splash-title">비즈니스라운지 체크리스트</div>
+  <div class="splash-sub">포스코인터내셔널 포스코타워-송도</div>
+  <div class="splash-bar-wrap"><div class="splash-bar"></div></div>
+</div>
+
+<div class="app">
+
+  <!-- 공통 헤더 -->
+  <div class="header">
+    <h1>비즈니스라운지 체크리스트</h1>
+    <p>포스코인터내셔널 포스코타워-송도</p>
+  </div>
+
+  <!-- 페이지 1: 점검자 선택 -->
+  <div id="page1">
+    <div class="page-body">
+      <!-- 에디터 패널 (기본 숨김) -->
+      <div id="editor-panel" style="display:none;background:#f0f4fb;border:1.5px solid var(--border);border-radius:14px;padding:16px;margin-bottom:20px;">
+        <div style="font-size:12px;font-weight:700;color:var(--primary);margin-bottom:12px;">🎨 이미지 설정</div>
+        <div style="margin-bottom:10px;">
+          <div style="font-size:11px;color:var(--muted);margin-bottom:6px;">로고 이미지 (스플래시/헤더)</div>
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+            <div style="width:48px;height:48px;border-radius:8px;border:2px dashed var(--border);overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:20px;background:#fff;" id="logo-thumb">🏢</div>
+            <span style="font-size:12px;color:var(--primary);font-weight:600;">사진 선택</span>
+            <input type="file" accept="image/*" style="display:none" onchange="setImg('logo',this)">
+          </label>
+        </div>
+        <div style="margin-bottom:10px;">
+          <div style="font-size:11px;color:var(--muted);margin-bottom:6px;">배경 이미지</div>
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+            <div style="width:48px;height:48px;border-radius:8px;border:2px dashed var(--border);overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:20px;background:#fff;" id="bg-thumb">🖼️</div>
+            <span style="font-size:12px;color:var(--primary);font-weight:600;">사진 선택</span>
+            <input type="file" accept="image/*" style="display:none" onchange="setImg('bg',this)">
+          </label>
+        </div>
+        <div style="margin-bottom:10px;">
+          <div style="font-size:11px;color:var(--muted);margin-bottom:6px;">오세림 프로필 사진</div>
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+            <div style="width:48px;height:48px;border-radius:50%;border:2px dashed var(--border);overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:20px;background:#fff;" id="p1-thumb">👩</div>
+            <span style="font-size:12px;color:var(--primary);font-weight:600;">사진 선택</span>
+            <input type="file" accept="image/*" style="display:none" onchange="setImg('p1',this)">
+          </label>
+        </div>
+        <div style="margin-bottom:14px;">
+          <div style="font-size:11px;color:var(--muted);margin-bottom:6px;">전승리 프로필 사진</div>
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+            <div style="width:48px;height:48px;border-radius:50%;border:2px dashed var(--border);overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:20px;background:#fff;" id="p2-thumb">👩</div>
+            <span style="font-size:12px;color:var(--primary);font-weight:600;">사진 선택</span>
+            <input type="file" accept="image/*" style="display:none" onchange="setImg('p2',this)">
+          </label>
+        </div>
+        <button onclick="saveImgs()" style="width:100%;padding:10px;background:var(--primary);color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">✅ 적용</button>
+        <button onclick="downloadHTML()" style="width:100%;padding:10px;background:#22c55e;color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:8px;">⬇️ HTML 저장 (GitHub 업로드용)</button>
+        <button onclick="document.getElementById('editor-panel').style.display='none'" style="width:100%;padding:8px;background:transparent;color:var(--muted);border:none;font-size:12px;cursor:pointer;margin-top:4px;font-family:inherit;">닫기</button>
+      </div>
+
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+        <div class="sec-label page1-text" style="margin-bottom:0;">점검자를 선택해주세요</div>
+        <button onclick="adminAuth()" style="font-size:11px;color:var(--primary);background:#e8f0fb;border:1.5px solid var(--primary);border-radius:6px;padding:5px 12px;cursor:pointer;font-family:inherit;font-weight:700;">⚙️ 관리</button>
+      </div>
+      <div class="inspector-grid">
+        <div class="ins-card" onclick="selectInspector('오세림',this)">
+          <div class="ins-avatar" id="avatar-p1" style="overflow:hidden;padding:0;">
+            <img id="img-p1" src="" alt="👩" style="width:100%;height:100%;object-fit:cover;display:none;">
+            <span id="emoji-p1">👩</span>
+          </div>
+          <div class="ins-name page1-text">오세림</div>
+          </div>
+        <div class="ins-card" onclick="selectInspector('전승리',this)">
+          <div class="ins-avatar" id="avatar-p2" style="overflow:hidden;padding:0;">
+            <img id="img-p2" src="" alt="👩" style="width:100%;height:100%;object-fit:cover;display:none;">
+            <span id="emoji-p2">👩</span>
+          </div>
+          <div class="ins-name page1-text">전승리</div>
+          
+        </div>
+      </div>
+
+      <div class="sec-label">점검 일시</div>
+      <div class="date-card">
+        <span class="label page1-text">📅 점검 일시</span>
+        <span class="val page1-text" id="today-date"></span>
+      </div>
+    </div>
+    <div class="btn-bar">
+      <button class="btn-primary" id="btn-next" onclick="goPage2()" disabled>점검 시작 →</button>
+    </div>
+  </div>
+
+  <!-- 페이지 2: 체크리스트 -->
+  <div id="page2">
+    <div class="page2-header">
+      <div class="info-pill" id="p2-inspector"></div>
+      <div class="date-pill" id="p2-date"></div>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>회의실</th>
+          <th style="width:36px;">전체</th>
+            <th>좌석 수</th>
+            <th>의자</th>
+            <th>전등</th>
+            <th>롤스크린</th>
+            <th>보드마카</th>
+            <th>휴지</th>
+            <th>물티슈</th>
+            <th>비고</th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+
+    <div style="padding:10px 16px;border-top:1px solid var(--border);display:flex;gap:8px;">
+      <button onclick="goPage1()" style="flex:1;padding:7px;background:transparent;color:var(--primary);border:1.5px solid var(--primary);border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;">← 점검자 변경</button>
+      <button onclick="submit()" style="flex:1;padding:7px;background:var(--primary);color:#fff;border:none;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;">제출 →</button>
+    </div>
+
+    <div class="footer-note">본 시스템은 포스코인터내셔널 시설물 관리와 임직원 편의 제고를 위해 운영됩니다.<br>개인정보는 수집하지 않습니다.</div>
+  </div>
+
+</div>
+
+<!-- 경고 모달 -->
+<div class="overlay" id="warn-overlay">
+  <div class="modal">
+    <div class="icon">⚠️</div>
+    <h2>조치사항 입력 필요</h2>
+    <p>미체크 항목이 있는 회의실은<br>조치사항을 입력해주세요.</p>
+    <div class="modal-info" id="warn-rooms-list"></div>
+    <button class="modal-btn" style="background:#ef4444;" onclick="document.getElementById('warn-overlay').classList.remove('show')">확인</button>
+  </div>
+</div>
+
+<!-- 완료 모달 -->
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <div class="icon">✅</div>
+    <h2>점검 완료!</h2>
+    <p>점검 결과가 정상적으로<br>접수되었습니다.</p>
+    <div class="modal-info">
+      <div class="mir"><span class="l">점검자</span><span class="r" id="d-ins"></span></div>
+      <div class="mir"><span class="l">점검일시</span><span class="r" id="d-date"></span></div>
+
+    </div>
+    <button class="modal-btn" onclick="resetApp()">새 점검 시작</button>
+  </div>
+</div>
+
+<script>
+const PA_URL = 'https://defaultb9501effd05e4bf18a87898d83f46c.eb.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/1c8202a808094b959f005368e99d2464/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=7PSu1V0TLuHT6hUIjKThKFqsYuDjmSgb-SZCWh-zRTE';
+const MANAGER_EMAIL = 'orionjungtpz@poscointl.com';
+
+const SEAT_MAP = {
+  '접견실':8,
+  'BIZ 1':12,'BIZ 2':12,'BIZ 3':8,'BIZ 4':8,'BIZ 5':8,'BIZ 6':8,
+  'BIZ 7':10,'BIZ 8':8,'BIZ 9':8,'BIZ 10':8,'BIZ 11':5,'BIZ 12':5,
+  'BIZ 13':10,'BIZ 14':5,'BIZ 15':8,'BIZ 16':8,'BIZ 17':10,'BIZ 18':8,
+  'TRAINING 1':16,'TRAINING 2':16,'TRAINING 3':16,
+};
+
+const ITEMS = ['chair','light','roll','marker','tissue','wet'];
+const ITEM_NAMES = ['의자','전등','롤스크린','보드마카','휴지','물티슈'];
+
+const ROOMS = [
+  {group:'접견실', list:['접견실']},
+  {group:'BIZ ROOM', list:Array.from({length:18},(_,i)=>`BIZ ${i+1}`)},
+  {group:'TRAINING ROOM', list:['TRAINING 1','TRAINING 2','TRAINING 3']},
+];
+
+let inspector = '';
+let state = {};
+
+// ── 관리자 인증 ──────────────────────────────────────
+const ADMIN_PW = '3692'; // 비밀번호 변경 가능
+
+function adminAuth() {
+  const pw = prompt('관리자 비밀번호를 입력하세요.');
+  if(pw === null) return;
+  if(pw === ADMIN_PW) {
+    const panel = document.getElementById('editor-panel');
+    panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+  } else {
+    alert('비밀번호가 올바르지 않습니다.');
+  }
+}
+
+// ── 이미지 설정 ──────────────────────────────────────
+const imgStore = {};
+
+function setImg(key, input) {
+  if(!input.files[0]) return;
+  const file = input.files[0];
+  const img = new Image();
+  const reader = new FileReader();
+  reader.onload = e => {
+    img.onload = () => {
+      // 캔버스로 압축
+      const canvas = document.createElement('canvas');
+      const MAX = key === 'bg' ? 1920 : key === 'logo' ? 300 : 400;
+      const QUALITY = key === 'bg' ? 0.92 : key === 'logo' ? 0.95 : 0.9;
+      let w = img.width, h = img.height;
+      if(w > MAX){ h = Math.round(h * MAX / w); w = MAX; }
+      if(h > MAX){ w = Math.round(w * MAX / h); h = MAX; }
+      canvas.width = w; canvas.height = h;
+      const ctx2 = canvas.getContext('2d');
+      ctx2.imageSmoothingEnabled = true;
+      ctx2.imageSmoothingQuality = 'high';
+      ctx2.drawImage(img, 0, 0, w, h);
+      // WebP 지원 시 WebP 사용 (더 선명하고 용량 작음)
+      const fmt = canvas.toDataURL('image/webp').startsWith('data:image/webp') ? 'image/webp' : 'image/jpeg';
+      const compressed = canvas.toDataURL(fmt, QUALITY);
+      imgStore[key] = compressed;
+      // 썸네일
+      const thumb = document.getElementById(key+'-thumb');
+      if(thumb){ thumb.innerHTML=''; const ti=document.createElement('img'); ti.src=compressed; ti.style.cssText='width:100%;height:100%;object-fit:cover;'; thumb.appendChild(ti); }
+      // 실시간 적용
+      if(key === 'p1') applyAvatar('p1', compressed);
+      if(key === 'p2') applyAvatar('p2', compressed);
+      if(key === 'bg') applyBg(compressed);
+      if(key === 'logo') applyLogo(compressed);
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function applyAvatar(key, src) {
+  const img = document.getElementById('img-'+key);
+  const emoji = document.getElementById('emoji-'+key);
+  if(img && emoji) {
+    img.src = src;
+    img.style.display = 'block';
+    emoji.style.display = 'none';
+  }
+}
+
+function applyBg(src) {
+  document.getElementById('page1').style.backgroundImage = `url('${src}')`;
+  document.getElementById('page1').style.backgroundSize = 'cover';
+  document.getElementById('page1').style.backgroundPosition = 'center';
+  // 스플래시에도 적용
+  const sbg = document.getElementById('splash-bg');
+  if(sbg){ sbg.style.backgroundImage = `url('${src}')`; sbg.classList.add('loaded'); }
+  // 밝기 감지 → 텍스트 색 자동 변경
+  detectBrightness(src, dark => {
+    const textColor = dark ? '#ffffff' : 'var(--text)';
+    const mutedColor = dark ? 'rgba(255,255,255,.75)' : 'var(--muted)';
+    document.querySelectorAll('.page1-text').forEach(el => el.style.color = textColor);
+    document.querySelectorAll('.page1-text-muted').forEach(el => el.style.color = mutedColor);
+    // 아바타 테두리
+    document.querySelectorAll('.ins-avatar').forEach(el => {
+      el.style.background = dark ? 'rgba(255,255,255,.2)' : '';
+      el.style.color = dark ? '#fff' : '';
+    });
+  });
+}
+
+function detectBrightness(src, callback) {
+  const img = new Image();
+  img.crossOrigin = 'anonymous';
+  img.onload = () => {
+    const canvas = document.createElement('canvas');
+    canvas.width = 50; canvas.height = 50;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(img, 0, 0, 50, 50);
+    const data = ctx.getImageData(0, 0, 50, 50).data;
+    let total = 0;
+    for(let i=0; i<data.length; i+=4){
+      total += 0.299*data[i] + 0.587*data[i+1] + 0.114*data[i+2];
+    }
+    const avg = total / (data.length/4);
+    callback(avg < 128); // 128 미만이면 어두운 배경
+  };
+  img.src = src;
+}
+
+function applyLogo(src) {
+  const img = document.getElementById('splash-logo-img');
+  const emoji = document.getElementById('splash-logo-emoji');
+  if(img && emoji) {
+    img.src = src;
+    img.style.display = 'block';
+    emoji.style.display = 'none';
+  }
+}
+
+function saveImgs() {
+  // localStorage에 저장 (다음 방문 시 유지)
+  try {
+    if(imgStore.p1) localStorage.setItem('voc_p1', imgStore.p1);
+    if(imgStore.p2) localStorage.setItem('voc_p2', imgStore.p2);
+    if(imgStore.bg) localStorage.setItem('voc_bg', imgStore.bg);
+    if(imgStore.logo) localStorage.setItem('voc_logo', imgStore.logo);
+    console.log('[저장] 완료 - p1:', !!imgStore.p1, 'p2:', !!imgStore.p2, 'bg:', !!imgStore.bg, 'logo:', !!imgStore.logo);
+  } catch(e) {
+    console.error('[저장 실패]', e);
+    showToast('⚠️ 저장 실패 - 이미지 용량을 줄여주세요');
+    return;
+  }
+  document.getElementById('editor-panel').style.display = 'none';
+  showToast('✅ 이미지가 적용되었습니다');
+}
+
+function loadSavedImgs() {
+  try {
+    const p1 = localStorage.getItem('voc_p1');
+    const p2 = localStorage.getItem('voc_p2');
+    const bg = localStorage.getItem('voc_bg');
+    const logo = localStorage.getItem('voc_logo');
+    if(p1){ imgStore.p1=p1; applyAvatar('p1',p1); const t=document.getElementById('p1-thumb'); if(t){t.innerHTML='';const i=document.createElement('img');i.src=p1;i.style.cssText='width:100%;height:100%;object-fit:cover;';t.appendChild(i);} }
+    if(p2){ imgStore.p2=p2; applyAvatar('p2',p2); const t=document.getElementById('p2-thumb'); if(t){t.innerHTML='';const i=document.createElement('img');i.src=p2;i.style.cssText='width:100%;height:100%;object-fit:cover;';t.appendChild(i);} }
+    if(bg){ imgStore.bg=bg; applyBg(bg); const t=document.getElementById('bg-thumb'); if(t){t.innerHTML='';const i=document.createElement('img');i.src=bg;i.style.cssText='width:100%;height:100%;object-fit:cover;';t.appendChild(i);} }
+    if(logo){ imgStore.logo=logo; applyLogo(logo); const t=document.getElementById('logo-thumb'); if(t){t.innerHTML='';const i=document.createElement('img');i.src=logo;i.style.cssText='width:100%;height:100%;object-fit:cover;';t.appendChild(i);} }
+  } catch(e) {}
+}
+
+function showToast(msg) {
+  let t = document.getElementById('img-toast');
+  if(!t){ t=document.createElement('div'); t.id='img-toast'; t.style.cssText='position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#1a2340;color:#fff;padding:10px 20px;border-radius:24px;font-size:13px;z-index:999;white-space:nowrap;'; document.body.appendChild(t); }
+  t.textContent = msg;
+  t.style.opacity = '1';
+  setTimeout(()=>{ t.style.opacity='0'; }, 3000);
+}
+
+window.onload = () => {
+  const now = new Date();
+  const dateStr = now.toLocaleString('ko-KR',{year:'numeric',month:'long',day:'numeric',hour:'2-digit',minute:'2-digit'});
+  document.getElementById('today-date').textContent = dateStr;
+  loadSavedImgs();
+  // 스플래시 2초 후 페이드아웃
+  setTimeout(() => {
+    const splash = document.getElementById('splash');
+    splash.classList.add('fade-out');
+    setTimeout(() => { splash.style.display = 'none'; }, 600);
+  }, 3000);
+};
+
+function selectInspector(name, el) {
+  inspector = name;
+  document.querySelectorAll('.ins-card').forEach(c=>c.classList.remove('selected'));
+  el.classList.add('selected');
+  document.getElementById('btn-next').disabled = false;
+}
+
+function goPage2() {
+  if(!inspector) return;
+  const dateStr = new Date().toLocaleString('ko-KR',{year:'numeric',month:'long',day:'numeric',hour:'2-digit',minute:'2-digit'});
+  document.getElementById('p2-inspector').textContent = '👤 ' + inspector;
+  document.getElementById('p2-date').textContent = '📅 ' + dateStr;
+  document.getElementById('page1').style.display = 'none';
+  document.getElementById('page2').style.display = 'flex';
+  buildTable();
+  window.scrollTo(0,0);
+}
+
+function goPage1() {
+  document.getElementById('page2').style.display = 'none';
+  document.getElementById('page1').style.display = 'flex';
+  window.scrollTo(0,0);
+}
+
+function buildTable() {
+  const tbody = document.getElementById('tbody');
+  tbody.innerHTML = '';
+  ROOMS.forEach(g => {
+    const gr = document.createElement('tr');
+    gr.className = 'group-row';
+    gr.innerHTML = `<td colspan="10">▸ ${g.group}</td>`;
+    tbody.appendChild(gr);
+
+    g.list.forEach(room => {
+      if(!state[room]){ state[room]={}; ITEMS.forEach(it=>state[room][it]=false); state[room].note=''; }
+      const rid = room.replace(/ /g,'-');
+      const tr = document.createElement('tr');
+      let cells = `<td>${room}</td>`;
+      cells += `<td><div class="chk-cell"><div class="chk" id="all-${rid}" onclick="toggleAll('${room}','${rid}',this)" title="전체 체크/해제">✓</div></div></td>`;
+      cells += `<td><span class="seat-val">${SEAT_MAP[room]||'-'}</span></td>`;
+      ITEMS.forEach(it => {
+        const checked = state[room][it] ? 'checked' : '';
+        cells += `<td><div class="chk-cell">
+          <div class="chk ${checked}" onclick="toggle('${room}','${it}',this)">✓</div>
+        </div></td>`;
+      });
+      cells += `<td class="note-td">
+          <div class="note-td-inner">
+            <input type="text" id="note-${rid}" placeholder="조치사항 (선택)" value="${state[room].note||''}">
+            <label class="photo-btn" title="사진 첨부">
+              📷
+              <input type="file" accept="image/*" style="display:none" onchange="attachPhoto('${room}',this)">
+            </label>
+          </div>
+          <div class="photo-preview" id="photo-${rid}"></div>
+        </td>`;
+      tr.innerHTML = cells;
+      tbody.appendChild(tr);
+    });
+  });
+  updateCount();
+}
+
+function toggle(room, item, el) {
+  state[room][item] = !state[room][item];
+  el.classList.toggle('checked', state[room][item]);
+  // 전체체크 버튼 동기화
+  const rid = room.replace(/ /g,'-');
+  const allEl = document.getElementById('all-'+rid);
+  if(allEl) allEl.classList.toggle('checked', ITEMS.every(it=>state[room][it]));
+  updateCount();
+}
+
+function updateCount() {
+  // 카운트 UI 제거됨 - 함수만 유지
+}
+
+// 사진 저장소
+const photoStore = {};
+
+function attachPhoto(room, input) {
+  if(!input.files[0]) return;
+  const rid = room.replace(/ /g,'-');
+  const reader = new FileReader();
+  reader.onload = e => {
+    if(!photoStore[room]) photoStore[room] = [];
+    photoStore[room].push(e.target.result);
+    renderPhotos(room, rid);
+  };
+  reader.readAsDataURL(input.files[0]);
+}
+
+function renderPhotos(room, rid) {
+  const preview = document.getElementById('photo-'+rid);
+  if(!preview) return;
+  preview.innerHTML = '';
+  (photoStore[room]||[]).forEach((src,i) => {
+    const img = document.createElement('img');
+    img.className = 'photo-thumb';
+    img.src = src;
+    img.title = '클릭하면 삭제';
+    img.onclick = () => { photoStore[room].splice(i,1); renderPhotos(room,rid); };
+    preview.appendChild(img);
+  });
+}
+
+function toggleAll(room, rid, el) {
+  if(!inspector){ document.getElementById('warn').classList.add('show'); window.scrollTo(0,0); return; }
+  const allChecked = ITEMS.every(it => state[room][it]);
+  const newVal = !allChecked;
+  ITEMS.forEach(it => { state[room][it] = newVal; });
+  // 개별 체크박스 UI 업데이트
+  ITEMS.forEach(it => {
+    const chk = document.querySelector(`[onclick="toggle('${room}','${it}',this)"]`);
+    if(chk) chk.classList.toggle('checked', newVal);
+  });
+  // 전체체크 버튼 상태
+  el.classList.toggle('checked', newVal);
+  updateCount();
+}
+
+function downloadHTML() {
+  // 현재 이미지들을 HTML에 직접 내장
+  let html = document.documentElement.outerHTML;
+
+  // 각 이미지를 인라인으로 교체
+  const keys = [
+    { key:'logo', search:'id="splash-logo-img" src=""', replace:`id="splash-logo-img" src="${imgStore.logo||''}"` },
+    { key:'p1',   search:'id="img-p1" src=""',          replace:`id="img-p1" src="${imgStore.p1||''}"` },
+    { key:'p2',   search:'id="img-p2" src=""',          replace:`id="img-p2" src="${imgStore.p2||''}"` },
+  ];
+  keys.forEach(({key, search, replace}) => {
+    if(imgStore[key]) html = html.replace(search, replace);
+  });
+
+  // 배경 이미지 CSS 내장
+  if(imgStore.bg) {
+    html = html.replace(
+      '/* BG-INLINE */',
+      `/* BG-INLINE */ #page1{background-image:url('${imgStore.bg}');background-size:cover;background-position:center;} #splash-bg{background-image:url('${imgStore.bg}');}`
+    );
+  }
+
+  const blob = new Blob([html], {type:'text/html;charset=utf-8'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'room_inspection.html';
+  a.click();
+  showToast('⬇️ 다운로드 완료! GitHub에 업로드해주세요');
+}
+
+function showWarnModal(rooms) {
+  const list = document.getElementById('warn-rooms-list');
+  list.innerHTML = rooms.map(r => `<div class="mir"><span class="l">${r}</span><span class="r" style="color:#ef4444;">조치사항 필요</span></div>`).join('');
+  document.getElementById('warn-overlay').classList.add('show');
+}
+
+function submit() {
+  // 미체크 항목 있는 방 중 조치사항 없는 방 검증
+  const warnRooms = [];
+  Object.keys(state).forEach(room => {
+    const hasUnchecked = ITEMS.some(it => !state[room][it]);
+    const note = document.getElementById('note-'+room.replace(/ /g,'-'))?.value?.trim()||'';
+    const noteEl = document.getElementById('note-'+room.replace(/ /g,'-'));
+    if(noteEl) noteEl.classList.remove('required-warn');
+    if(hasUnchecked && !note) warnRooms.push(room);
+  });
+  if(warnRooms.length > 0) {
+    warnRooms.forEach(room => {
+      const noteEl = document.getElementById('note-'+room.replace(/ /g,'-'));
+      if(noteEl){ noteEl.classList.add('required-warn'); noteEl.focus(); }
+    });
+    alert(`미체크 항목이 있는 회의실은 조치사항을 입력해주세요:\n\n${warnRooms.join(', ')}`);
+    return;
+  }
+  const submittedAt = new Date().toLocaleString('ko-KR',{timeZone:'Asia/Seoul'});
+  const rows=[];
+  const notesData = {};   // 조치사항 별도
+  Object.keys(state).forEach(room => {
+    const note = document.getElementById('note-'+room.replace(/ /g,'-'))?.value||'';
+    state[room].note = note;
+    const itemResults = ITEMS.map((it,i)=>({name:ITEM_NAMES[i],result:state[room][it]?'✓':'미체크'}));
+    rows.push({room, seat:SEAT_MAP[room]||'-', items:itemResults});
+    if(note) notesData[room] = note;  // 조치사항 있는 방만
+  });
+  // 사진 base64 수집
+  const photosData = {};
+  Object.keys(photoStore).forEach(room => { if(photoStore[room]?.length) photosData[room] = photoStore[room]; });
+  // 미체크 항목 요약 생성
+  const uncheckedSummary = [];
+  rows.forEach(r => {
+    const bad = r.items.filter(it => it.result === '미체크').map(it => it.name);
+    if(bad.length > 0) {
+      const note = notesData[r.room] ? ` → ${notesData[r.room]}` : '';
+      uncheckedSummary.push(`• ${r.room}: ${bad.join(', ')}${note}`);
+    }
+  });
+  const hasUnchecked = uncheckedSummary.length > 0;
+  const hasNotes = Object.keys(notesData).length > 0;
+
+  // 이메일 제목 상태 결정
+  const statusTag = hasUnchecked ? '점검필요' : '양호';
+
+  const summaryText = hasUnchecked
+    ? uncheckedSummary.join('\n')
+    : '✅ 모든 항목 정상';
+
+  // 이메일 본문 완성
+  let emailBody = `점검자: ${inspector}
+점검일시: ${submittedAt}
+
+[점검 결과]
+${summaryText}`;
+
+  if(Object.keys(notesData).length > 0) {
+    const noteLines = Object.entries(notesData).map(([room,note]) => `• ${room}: ${note}`).join('\n');
+    emailBody += `\n\n[조치사항]\n${noteLines}`;
+  }
+
+  if(Object.keys(photosData).length > 0) {
+    const photoRooms = Object.keys(photosData).map(room => `• ${room}: ${photosData[room].length}장`).join('\n');
+    emailBody += `\n\n[첨부사진]\n${photoRooms}`;
+  }
+
+  const payload={
+    inspector,
+    submittedAt,
+    rows: JSON.stringify(rows),
+    notes: JSON.stringify(notesData),
+    photos: JSON.stringify(photosData),
+    summary: summaryText,
+    statusTag,
+    emailBody,
+    managerEmail: MANAGER_EMAIL
+  };
+  document.getElementById('d-ins').textContent=inspector;
+  document.getElementById('d-date').textContent=submittedAt;
+
+  document.getElementById('overlay').classList.add('show');
+  if(PA_URL!=='YOUR_POWER_AUTOMATE_HTTP_TRIGGER_URL'){
+    fetch(PA_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)}).catch(e=>console.warn(e));
+  } else { console.log('[점검 테스트]',payload); }
+}
+
+function resetApp() {
+  inspector=''; state={}; Object.keys(photoStore).forEach(k=>delete photoStore[k]);
+  document.querySelectorAll('.ins-card').forEach(c=>c.classList.remove('selected'));
+  document.getElementById('btn-next').disabled = true;
+  document.getElementById('overlay').classList.remove('show');
+  document.getElementById('page2').style.display='none';
+  document.getElementById('page1').style.display='flex';
+  window.scrollTo(0,0);
+}
+</script>
+</body>
+</html>
