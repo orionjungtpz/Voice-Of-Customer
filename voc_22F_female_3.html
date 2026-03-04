@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>고객의 소리 | 포스코타워-송도 22층 여자화장실 #3</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Noto+Serif+KR:wght@400;700&family=IBM+Plex+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --primary:#003087; --accent:#0055c8; --light:#e8f0fb;
+  --text:#1a1a2e; --muted:#6b7280; --border:#e0e7f3;
+  --bg:#f5f7fc; --card:#fff; --shadow:0 4px 24px rgba(0,48,135,0.10);
+  --safe-top: env(safe-area-inset-top);
+  --safe-bottom: env(safe-area-inset-bottom);
+}
+* { box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
+html, body { height:100%; overflow:hidden; }
+body { font-family:'Noto Sans KR',sans-serif; background:var(--bg); color:var(--text); }
+
+/* ── 스플래시 ── */
+#splash {
+  position:fixed; inset:0; z-index:9999;
+  background:var(--primary) url('./splash_bg.jpeg') center/cover no-repeat;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:20px;
+  transition:opacity .5s ease, transform .5s ease;
+  will-change:opacity,transform;
+  -webkit-transform:translateZ(0); transform:translateZ(0);
+  backface-visibility:hidden; -webkit-backface-visibility:hidden;
+}
+#splash.hide { opacity:0; transform:scale(1.03) translateZ(0); pointer-events:none; }
+#splashOverlay {
+  position:absolute; inset:0; z-index:0;
+  background:rgba(0,0,0,0);
+  transition:background .3s;
+}
+#splash > *:not(#splashOverlay) { position:relative; z-index:1; }
+.splash-logo { width:72px; height:72px; background:rgba(255,255,255,.15); border-radius:20px; display:flex; align-items:center; justify-content:center; font-size:36px; animation:splashPop .6s cubic-bezier(.34,1.56,.64,1); }
+.splash-title { color:#fff; font-size:22px; font-weight:700; animation:splashFade .8s ease .2s both; }
+.splash-sub { color:rgba(255,255,255,.65); font-size:13px; animation:splashFade .8s ease .4s both; }
+.splash-bar { width:160px; height:3px; background:rgba(255,255,255,.2); border-radius:2px; overflow:hidden; margin-top:8px; animation:splashFade .8s ease .4s both; }
+.splash-bar-inner { height:100%; background:#fff; border-radius:2px; animation:splashProgress 2.3s ease forwards; }
+@keyframes splashPop { from{transform:scale(.6);opacity:0} to{transform:scale(1);opacity:1} }
+@keyframes splashFade { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:none} }
+@keyframes splashProgress { from{width:0} to{width:100%} }
+
+/* ── 메인 앱 ── */
+#app {
+  position:fixed; inset:0;
+  overflow-y:auto; overflow-x:hidden;
+  -webkit-overflow-scrolling:touch;
+  padding-bottom:calc(80px + var(--safe-bottom));
+  background:var(--bg);
+  opacity:0; transition:opacity .5s ease;
+}
+#app.show { opacity:1; }
+#app.has-bg {
+  background-size:cover; background-position:center; background-repeat:no-repeat;
+}
+#bgOverlay {
+  display:none; position:fixed; inset:0; z-index:0; pointer-events:none;
+}
+#app.has-bg #bgOverlay { display:block; }
+#app > .app-content { position:relative; z-index:1; }
+
+/* ── 헤더 ── */
+.header {
+  background:var(--primary);
+  padding:calc(16px + var(--safe-top)) 20px 24px;
+}
+.header h1 { color:#fff; font-size:19px; font-weight:700; line-height:1.3; }
+.header p { color:rgba(255,255,255,.75); font-size:12px; margin-top:4px; font-weight:300; }
+
+/* ── 카드 ── */
+.card {
+  background:rgba(255,255,255,0.95);
+  margin:14px; border-radius:16px;
+  box-shadow:var(--shadow); padding:18px;
+  backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px);
+}
+.section-title {
+  font-size:13px; font-weight:700; color:var(--primary);
+  letter-spacing:.3px; margin-bottom:14px;
+  display:flex; align-items:center; gap:6px;
+}
+.section-title::before { content:''; display:block; width:3px; height:14px; background:var(--accent); border-radius:2px; }
+
+/* ── 칩 ── */
+.chip-group { display:flex; gap:8px; flex-wrap:wrap; }
+.chip {
+  display:flex; align-items:center; gap:6px;
+  padding:10px 14px; border:1.5px solid var(--border);
+  border-radius:50px; cursor:pointer;
+  font-size:14px; font-weight:500;
+  color:var(--muted); background:#fff;
+  transition:all .18s; user-select:none; -webkit-user-select:none;
+  font-family:'Noto Sans KR',sans-serif;
+}
+.chip:active { transform:scale(.96); }
+.chip.selected { border-color:var(--accent); background:var(--light); color:var(--accent); font-weight:700; }
+.sub-row { margin-top:14px; padding-top:14px; border-top:1px dashed var(--border); }
+.breadcrumb { font-size:11px; color:var(--muted); margin-bottom:10px; display:flex; align-items:center; gap:5px; flex-wrap:wrap; }
+.breadcrumb b { color:var(--accent); }
+.summary-box { margin-top:14px; background:var(--light); border-radius:10px; padding:10px 14px; font-size:13px; color:var(--accent); font-weight:600; display:none; }
+
+textarea {
+  width:100%; padding:14px;
+  border:1.5px solid var(--border); border-radius:10px;
+  font-family:'Noto Sans KR',sans-serif;
+  font-size:14px; color:var(--text); background:#fafbfe;
+  outline:none; resize:vertical; min-height:120px; line-height:1.8;
+  -webkit-appearance:none;
+}
+textarea:focus { border-color:var(--accent); background:#fff; }
+.char-count { text-align:right; font-size:11px; color:var(--muted); margin-top:6px; }
+.field label { display:block; font-size:13px; font-weight:600; color:var(--text); margin-bottom:7px; }
+.req { color:#e74c3c; margin-left:3px; }
+
+/* ── 제출 버튼 ── */
+.submit-btn {
+  display:block; width:calc(100% - 28px); margin:0 14px;
+  padding:16px; background:var(--primary); color:#fff;
+  border:none; border-radius:14px;
+  font-family:'Noto Sans KR',sans-serif;
+  font-size:16px; font-weight:700; cursor:pointer;
+  box-shadow:0 4px 16px rgba(0,48,135,.25); -webkit-appearance:none;
+}
+.submit-btn:disabled { background:#9ca3af; box-shadow:none; }
+.privacy-note { text-align:center; font-size:11px; color:var(--muted); margin:12px 14px 0; line-height:1.7; }
+
+/* ── 성공 오버레이 ── */
+.overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.55); z-index:500; align-items:center; justify-content:center; padding:24px; }
+.overlay.show { display:flex; }
+.success-card { background:#fff; border-radius:20px; padding:32px 24px; text-align:center; width:100%; max-width:340px; animation:popIn .3s cubic-bezier(.34,1.56,.64,1); }
+.success-emoji { font-size:48px; margin-bottom:12px; }
+.success-card h2 { font-size:19px; font-weight:700; color:var(--primary); margin-bottom:8px; }
+.success-card p { font-size:13px; color:var(--muted); line-height:1.7; }
+.receipt-box { margin-top:14px; background:var(--light); border-radius:10px; padding:12px; }
+.receipt-num { font-size:17px; font-weight:700; color:var(--accent); letter-spacing:1px; }
+.receipt-desc { font-size:11px; color:var(--muted); margin-top:4px; }
+.success-close { margin-top:20px; width:100%; padding:13px; background:var(--primary); color:#fff; border:none; border-radius:12px; font-family:inherit; font-size:15px; font-weight:600; cursor:pointer; }
+@keyframes popIn { from{transform:scale(.8);opacity:0} to{transform:scale(1);opacity:1} }
+
+/* ── 설정 버튼 ── */
+#adminBtn {
+  position:fixed;
+  bottom:calc(18px + var(--safe-bottom));
+  right:18px; z-index:200;
+  width:40px; height:40px;
+  background:rgba(255,255,255,.7);
+  border:1px solid var(--border);
+  border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; -webkit-appearance:none;
+  box-shadow:0 2px 8px rgba(0,0,0,.1);
+}
+#adminBtn svg { width:18px; height:18px; }
+
+/* ── 관리자 모달 ── */
+.modal-overlay {
+  display:none; position:fixed; inset:0;
+  background:rgba(0,0,0,.6); z-index:800;
+  align-items:flex-end; justify-content:center;
+}
+.modal-overlay.show { display:flex; }
+.modal-sheet {
+  background:#fff; border-radius:24px 24px 0 0;
+  width:100%; max-width:480px;
+  padding:20px 20px calc(24px + var(--safe-bottom));
+  animation:slideUp .3s cubic-bezier(.4,0,.2,1);
+  max-height:90vh; overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+}
+@keyframes slideUp { from{transform:translateY(100%)} to{transform:none} }
+.modal-handle { width:40px; height:4px; background:#e0e7f3; border-radius:2px; margin:0 auto 20px; }
+.modal-title { font-size:17px; font-weight:700; color:var(--primary); margin-bottom:20px; }
+
+/* PIN */
+.pw-dots { display:flex; gap:14px; justify-content:center; margin:20px 0 24px; }
+.pw-dot { width:14px; height:14px; border-radius:50%; background:#e0e7f3; transition:background .15s; }
+.pw-dot.filled { background:var(--primary); }
+.pin-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
+.pin-btn {
+  padding:16px; border:1.5px solid var(--border); border-radius:12px;
+  background:#fff; font-size:18px; font-weight:600; color:var(--text);
+  cursor:pointer; text-align:center; transition:all .15s; -webkit-appearance:none;
+}
+.pin-btn:active { background:var(--light); border-color:var(--accent); }
+.pin-error { color:#e74c3c; font-size:12px; text-align:center; margin-top:10px; min-height:18px; }
+
+/* 관리자 설정 */
+#adminScreen { display:none; }
+.setting-group { margin-bottom:20px; }
+.setting-label { font-size:11px; font-weight:700; color:var(--muted); letter-spacing:.5px; margin-bottom:8px; text-transform:uppercase; }
+.setting-input {
+  width:100%; padding:11px 14px;
+  border:1.5px solid var(--border); border-radius:10px;
+  font-family:'Noto Sans KR',sans-serif; font-size:14px;
+  color:var(--text); background:#fafbfe; outline:none; -webkit-appearance:none;
+}
+.setting-input:focus { border-color:var(--accent); }
+.setting-select {
+  width:100%; padding:11px 32px 11px 14px;
+  border:1.5px solid var(--border); border-radius:10px;
+  font-family:'Noto Sans KR',sans-serif; font-size:14px;
+  color:var(--text); background:#fafbfe; outline:none;
+  -webkit-appearance:none; appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b7280' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+  background-repeat:no-repeat; background-position:right 12px center;
+}
+.range-wrap { display:flex; align-items:center; gap:10px; }
+.range-wrap input[type=range] {
+  flex:1; -webkit-appearance:none; height:4px;
+  background:var(--border); border-radius:2px; outline:none;
+}
+.range-wrap input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance:none; width:20px; height:20px;
+  border-radius:50%; background:var(--primary); cursor:pointer;
+}
+.range-val { font-size:13px; font-weight:700; color:var(--accent); min-width:40px; text-align:right; }
+.align-btns { display:flex; gap:8px; }
+.align-btn {
+  flex:1; padding:11px; border:1.5px solid var(--border); border-radius:10px;
+  background:#fff; font-size:13px; color:var(--muted); cursor:pointer; text-align:center;
+  -webkit-appearance:none; transition:all .15s;
+}
+.align-btn.active { background:var(--light); border-color:var(--accent); color:var(--accent); font-weight:700; }
+.preview-box {
+  background:var(--light); border-radius:10px; padding:14px;
+  font-size:14px; font-family:'Noto Sans KR',sans-serif;
+  letter-spacing:0px; text-align:left; color:var(--text); line-height:1.6;
+}
+.bg-tab {
+  flex:1; padding:9px; border:1.5px solid var(--border); border-radius:10px;
+  background:#fff; font-size:13px; color:var(--muted); cursor:pointer;
+  -webkit-appearance:none; transition:all .15s;
+}
+.bg-tab.active { background:var(--light); border-color:var(--accent); color:var(--accent); font-weight:700; }
+.admin-save-btn {
+  width:100%; padding:15px; background:var(--primary); color:#fff;
+  border:none; border-radius:12px;
+  font-family:'Noto Sans KR',sans-serif; font-size:15px; font-weight:700;
+  cursor:pointer; margin-top:8px; -webkit-appearance:none;
+}
+.admin-reset-btn {
+  width:100%; padding:12px; background:#fff; color:var(--muted);
+  border:1.5px solid var(--border); border-radius:12px;
+  font-family:'Noto Sans KR',sans-serif; font-size:13px;
+  cursor:pointer; margin-top:8px; -webkit-appearance:none;
+}
+</style>
+</head>
+<body>
+
+<!-- 스플래시 -->
+<div id="splash">
+  <div id="splashOverlay"></div>
+  <div class="splash-logo">🚻</div>
+  <div class="splash-title" id="splashTitle">포스코인터내셔널</div>
+  <div class="splash-sub" id="splashSub">행정지원그룹</div>
+  <div class="splash-bar"><div class="splash-bar-inner"></div></div>
+</div>
+
+<!-- 메인 앱 -->
+<div id="app">
+  <div id="bgOverlay"></div>
+  <div class="app-content">
+    <div class="header">
+      <h1>포스코인터내셔널 시설물 VoC 접수</h1>
+      <p>📍 포스코타워-송도 22층 여자화장실 #3</p>
+    </div>
+
+    <div class="card">
+      <div class="section-title">접수 유형</div>
+      <div class="chip-group" id="g1"></div>
+      <div id="w2" style="display:none">
+        <div class="sub-row">
+          <div class="breadcrumb" id="b2"></div>
+          <div class="chip-group" id="g2"></div>
+        </div>
+      </div>
+      <div id="w3" style="display:none">
+        <div class="sub-row">
+          <div class="breadcrumb" id="b3"></div>
+          <div class="chip-group" id="g3"></div>
+        </div>
+      </div>
+      <div class="summary-box" id="summaryBox"></div>
+    </div>
+
+    <div class="card">
+      <div class="section-title">피드백 결과 확인 <span style="font-size:11px;font-weight:400;color:var(--muted);margin-left:4px">선택사항</span></div>
+      <div style="display:flex;align-items:center;gap:12px;">
+        <span style="font-size:20px;flex-shrink:0;">📩</span>
+        <input type="email" id="fbEmail" placeholder="이메일 주소 입력" autocomplete="email"
+          style="flex:1;padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;font-family:inherit;font-size:14px;color:var(--text);background:#fafbfe;outline:none;-webkit-appearance:none;">
+      </div>
+      <div style="font-size:11px;color:var(--muted);margin-top:8px;">💡 담당자에게는 노출되지 않으며, 조치 완료 알림 발송에만 사용됩니다.</div>
+    </div>
+
+    <div class="card" id="contentCard" style="display:none">
+      <div class="section-title">의견 내용</div>
+      <div class="field">
+        <label>내용 <span class="req">*</span></label>
+        <textarea id="vocContent" placeholder="불편하셨던 점이나 개선이 필요한 내용을 자유롭게 작성해 주세요." maxlength="1000"
+          oninput="document.getElementById('cc').textContent=this.value.length"></textarea>
+        <div class="char-count"><span id="cc">0</span> / 1000</div>
+      </div>
+    </div>
+
+    <button class="submit-btn" id="submitBtn" onclick="submitForm()">📤 익명으로 접수하기</button>
+    <p class="privacy-note">본 시스템은 포스코인터내셔널 시설물 관리와 임직원 편의 제고를 위해 운영됩니다.<br>개인정보는 수집하지 않습니다.</p>
+  </div>
+</div>
+
+<!-- 설정 버튼 -->
+<button id="adminBtn" onclick="openAdmin()" aria-label="관리자 설정">
+  <svg viewBox="0 0 24 24" fill="none" stroke="#003087" stroke-width="1.8" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="12" cy="12" r="3"/>
+    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+  </svg>
+</button>
+
+<!-- 성공 오버레이 -->
+<div class="overlay" id="doneOverlay">
+  <div class="success-card">
+    <div class="success-emoji">✅</div>
+    <h2>접수 완료!</h2>
+    <p>의견을 보내주셔서 감사합니다.<br>담당자가 신속히 검토하겠습니다.</p>
+    <div class="receipt-box">
+      <div class="receipt-num" id="receiptNum"></div>
+      <div class="receipt-desc">📌 접수번호를 기록해 두시면 확인에 도움이 됩니다</div>
+    </div>
+    <button class="success-close" onclick="closeSuccess()">확인</button>
+  </div>
+</div>
+
+<!-- 관리자 모달 -->
+<div class="modal-overlay" id="adminModal" onclick="outsideClose(event)">
+  <div class="modal-sheet" id="modalSheet">
+    <div class="modal-handle"></div>
+
+    <!-- PIN 입력 -->
+    <div id="pwScreen">
+      <div class="modal-title">🔐 관리자 모드</div>
+      <div class="pw-dots">
+        <div class="pw-dot" id="d0"></div>
+        <div class="pw-dot" id="d1"></div>
+        <div class="pw-dot" id="d2"></div>
+        <div class="pw-dot" id="d3"></div>
+      </div>
+      <div class="pin-grid">
+        <button class="pin-btn" onclick="pinInput('1')">1</button>
+        <button class="pin-btn" onclick="pinInput('2')">2</button>
+        <button class="pin-btn" onclick="pinInput('3')">3</button>
+        <button class="pin-btn" onclick="pinInput('4')">4</button>
+        <button class="pin-btn" onclick="pinInput('5')">5</button>
+        <button class="pin-btn" onclick="pinInput('6')">6</button>
+        <button class="pin-btn" onclick="pinInput('7')">7</button>
+        <button class="pin-btn" onclick="pinInput('8')">8</button>
+        <button class="pin-btn" onclick="pinInput('9')">9</button>
+        <button class="pin-btn" onclick="pinClear()" style="font-size:13px;color:var(--muted)">지우기</button>
+        <button class="pin-btn" onclick="pinInput('0')">0</button>
+        <button class="pin-btn" onclick="closeAdmin()" style="font-size:13px;color:var(--muted)">취소</button>
+      </div>
+      <div class="pin-error" id="pinError"></div>
+    </div>
+
+    <!-- 설정 화면 -->
+    <div id="adminScreen">
+      <div class="modal-title">⚙️ 화면 설정</div>
+
+      <div class="setting-group">
+        <div class="setting-label">배경 이미지</div>
+        <div style="display:flex;gap:6px;margin-bottom:10px;">
+          <button class="bg-tab active" id="tabUrl" onclick="switchBgTab('url')">🔗 URL</button>
+          <button class="bg-tab" id="tabFile" onclick="switchBgTab('file')">📁 파일 업로드</button>
+        </div>
+        <div id="bgUrlWrap">
+          <input class="setting-input" id="bgUrl" type="url" placeholder="https://example.com/image.jpg" oninput="onBgChange()">
+          <div style="font-size:11px;color:var(--muted);margin-top:5px;">JPG, JPEG, PNG, GIF, WEBP 링크 사용 가능</div>
+        </div>
+        <div id="bgFileWrap" style="display:none">
+          <label id="fileLabel" style="display:flex;align-items:center;justify-content:center;gap:8px;padding:20px;border:2px dashed var(--border);border-radius:10px;cursor:pointer;font-size:14px;color:var(--muted);background:#fafbfe;">
+            <span style="font-size:24px;">🖼️</span>
+            <span id="fileLabelText">JPG, JPEG, PNG, GIF, WEBP 선택</span>
+            <input type="file" id="bgFile" accept=".jpg,.jpeg,.png,.gif,.webp,image/jpeg,image/png,image/gif,image/webp" style="display:none" onchange="onFileSelect(this)">
+          </label>
+          <div id="filePreviewWrap" style="display:none;margin-top:8px;position:relative;">
+            <img id="filePreview" style="width:100%;height:100px;object-fit:cover;border-radius:10px;display:block;">
+            <button onclick="clearFile()" style="position:absolute;top:6px;right:6px;background:rgba(0,0,0,.5);color:#fff;border:none;border-radius:50%;width:24px;height:24px;font-size:13px;cursor:pointer;line-height:1;">✕</button>
+          </div>
+          <div id="fileSizeHint" style="font-size:11px;color:var(--muted);margin-top:5px;">최대 5MB · 모바일 최적화 자동 적용</div>
+        </div>
+      </div>
+
+      <div class="setting-group" id="dimGroup" style="display:none">
+        <div class="setting-label">배경 어둡기</div>
+        <div class="range-wrap">
+          <input type="range" id="bgDim" min="0" max="80" value="30" oninput="updateDimVal()">
+          <span class="range-val" id="dimVal">30%</span>
+        </div>
+      </div>
+
+      <div class="setting-group">
+        <div class="setting-label">글씨체</div>
+        <select class="setting-select" id="fontSel" onchange="updatePreview()">
+          <option value="Noto Sans KR">Noto Sans KR (기본)</option>
+          <option value="Noto Serif KR">Noto Serif KR (명조)</option>
+          <option value="IBM Plex Sans KR">IBM Plex Sans KR</option>
+        </select>
+      </div>
+
+      <div class="setting-group">
+        <div class="setting-label">글씨 크기</div>
+        <div class="range-wrap">
+          <input type="range" id="fontSz" min="11" max="18" value="14" oninput="updatePreview()">
+          <span class="range-val" id="fontSzVal">14px</span>
+        </div>
+      </div>
+
+      <div class="setting-group">
+        <div class="setting-label">자간</div>
+        <div class="range-wrap">
+          <input type="range" id="spacing" min="-1" max="5" value="0" step="0.5" oninput="updatePreview()">
+          <span class="range-val" id="spacingVal">0px</span>
+        </div>
+      </div>
+
+      <div class="setting-group">
+        <div class="setting-label">텍스트 정렬</div>
+        <div class="align-btns">
+          <button class="align-btn active" id="aLeft" onclick="setAlign('left')">◀ 좌측</button>
+          <button class="align-btn" id="aCenter" onclick="setAlign('center')">가운데</button>
+          <button class="align-btn" id="aRight" onclick="setAlign('right')">우측 ▶</button>
+        </div>
+      </div>
+
+      <div class="setting-group">
+        <div class="setting-label">스플래시 제목</div>
+        <input class="setting-input" id="splashTitleInput" type="text" placeholder="포스코인터내셔널" maxlength="30" oninput="updatePreview()">
+      </div>
+
+      <div class="setting-group">
+        <div class="setting-label">스플래시 부제목</div>
+        <input class="setting-input" id="splashSubInput" type="text" placeholder="행정지원그룹" maxlength="40" oninput="updatePreview()">
+      </div>
+
+      <div class="setting-group">
+        <div class="setting-label">미리보기</div>
+        <div class="preview-box" id="previewBox">포스코인터내셔널 시설물 고객의 소리입니다. 불편사항을 접수해 주세요.</div>
+      </div>
+
+      <button class="admin-save-btn" onclick="saveSettings()">✅ 설정 저장 및 적용</button>
+      <button class="admin-reset-btn" onclick="resetSettings()">↩ 기본값으로 초기화</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const PA_URL = 'https://defaultb9501effd05e4bf18a87898d83f46c.eb.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/2a22c45254c5402490885654cfe7fe09/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=VCYxholJl1z-bawOxNgZEaMI060JOj4ety_a-SoPdY4';
+const LOC    = '포스코타워-송도 22층 여자화장실 #3';
+
+const TREE = [
+  { value:'좌변기', icon:'🚽', label:'좌변기',
+    children:[
+      { value:'좌변기 > 막힘', icon:'🪠', label:'막힘' },
+      { value:'비데', icon:'💦', label:'비데',
+        sub:[
+          { value:'좌변기 > 비데 > 누수', icon:'💧', label:'누수' },
+          { value:'좌변기 > 비데 > 물이 안나옴', icon:'❌', label:'물이 안나옴' },
+          { value:'좌변기 > 비데 > 기타', icon:'💬', label:'기타', isOther:true },
+        ]
+      },
+      { value:'변기클리너', icon:'🧴', label:'변기클리너',
+        sub:[
+          { value:'좌변기 > 변기클리너 > 누수', icon:'💧', label:'누수' },
+          { value:'좌변기 > 변기클리너 > 용액 부족', icon:'❌', label:'용액 부족' },
+          { value:'좌변기 > 변기클리너 > 기타', icon:'💬', label:'기타', isOther:true },
+        ]
+      },
+      { value:'좌변기 > 기타', icon:'💬', label:'기타', isOther:true },
+    ]
+  },
+  { value:'기타', icon:'💬', label:'기타', isOther:true },
+];
+
+// ── 상태 ──
+let finalCat='', s1=null, s2=null, needText=false;
+let pinBuf='', curAlign='left';
+
+// ── 스플래시 ──
+window.addEventListener('load', function() {
+  applySettings();
+  setTimeout(function() {
+    document.getElementById('splash').classList.add('hide');
+    document.getElementById('app').classList.add('show');
+  }, 2500);
+});
+
+// ── VoC 폼 ──
+function chips(gid, items, fn) {
+  document.getElementById(gid).innerHTML = items.map(function(it) {
+    return '<div class="chip" data-v="' + it.value + '" onclick="' + fn + '(this)"><span>' + it.icon + '</span>' + it.label + '</div>';
+  }).join('');
+}
+function deselect(gid) { document.querySelectorAll('#'+gid+' .chip').forEach(function(c){c.classList.remove('selected');}); }
+function crumb(bid, parts) {
+  document.getElementById(bid).innerHTML = parts.map(function(p,i){ return i===0?'<b>'+p+'</b>':'<span>›</span><b>'+p+'</b>'; }).join('');
+}
+function showSummary(txt) { var el=document.getElementById('summaryBox'); el.textContent='✅ '+txt; el.style.display='block'; }
+function clearSummary() { document.getElementById('summaryBox').style.display='none'; }
+function setContent(show) {
+  needText=show;
+  document.getElementById('contentCard').style.display=show?'block':'none';
+  if(!show){document.getElementById('vocContent').value='';document.getElementById('cc').textContent='0';}
+}
+function initForm() {
+  chips('g1', TREE, 'c1');
+  document.getElementById('w2').style.display='none';
+  document.getElementById('w3').style.display='none';
+  setContent(false); clearSummary();
+  finalCat=''; s1=null; s2=null;
+}
+initForm();
+
+function c1(el) {
+  deselect('g1'); el.classList.add('selected');
+  document.getElementById('w2').style.display='none';
+  document.getElementById('w3').style.display='none';
+  setContent(false); clearSummary();
+  finalCat=''; s1=null; s2=null;
+  s1 = TREE.find(function(i){return i.value===el.dataset.v;});
+  if(!s1) return;
+  if(s1.children) { chips('g2',s1.children,'c2'); crumb('b2',[s1.label]); document.getElementById('w2').style.display='block'; }
+  else if(s1.isOther) { finalCat=s1.value; setContent(true); showSummary(s1.label); }
+  else { finalCat=s1.value; showSummary(s1.label); }
+}
+function c2(el) {
+  deselect('g2'); el.classList.add('selected');
+  document.getElementById('w3').style.display='none';
+  setContent(false); clearSummary();
+  finalCat=''; s2=null;
+  s2 = s1.children.find(function(i){return i.value===el.dataset.v;});
+  if(!s2) return;
+  if(s2.sub) { chips('g3',s2.sub,'c3'); crumb('b3',[s1.label,s2.label]); document.getElementById('w3').style.display='block'; }
+  else if(s2.isOther) { finalCat=s2.value; setContent(true); showSummary(s1.label+' › '+s2.label); }
+  else { finalCat=s2.value; showSummary(s1.label+' › '+s2.label); }
+}
+function c3(el) {
+  deselect('g3'); el.classList.add('selected');
+  setContent(false); clearSummary();
+  var item = s2.sub.find(function(i){return i.value===el.dataset.v;});
+  if(!item) return;
+  finalCat=item.value;
+  if(item.isOther) setContent(true);
+  showSummary(s1.label+' › '+s2.label+' › '+item.label);
+}
+
+function genReceipt() {
+  var n=new Date();
+  return 'VOC-'+n.getFullYear()+String(n.getMonth()+1).padStart(2,'0')+String(n.getDate()).padStart(2,'0')+'-'+String(Math.floor(Math.random()*90000)+10000);
+}
+async function submitForm() {
+  if(!finalCat){alert('접수 유형을 선택해 주세요.');return;}
+  var content=document.getElementById('vocContent').value.trim();
+  if(needText&&!content){alert('기타 내용을 입력해 주세요.');return;}
+  var btn=document.getElementById('submitBtn');
+  btn.disabled=true; btn.textContent='⏳ 접수 중...';
+  try {
+    var receiptNum=genReceipt();
+    var payload={receiptNum:receiptNum,submittedAt:new Date().toLocaleString('ko-KR',{timeZone:'Asia/Seoul'}),location:LOC,category:finalCat,title:finalCat,content:needText?content:'',email:document.getElementById('fbEmail').value.trim()||'익명',phone:'익명',isAnonymous:!document.getElementById('fbEmail').value.trim(),wantFeedback:!!document.getElementById('fbEmail').value.trim(),attachments:[]};
+    document.getElementById('receiptNum').textContent=receiptNum;
+    document.getElementById('doneOverlay').classList.add('show');
+    if(PA_URL&&PA_URL!=='YOUR_PA_URL') {
+      fetch(PA_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)})
+        .then(function(r){if(!r.ok&&r.status!==202)console.warn('[VOC] 전송 실패:',r.status);})
+        .catch(function(e){console.warn('[VOC] 오류:',e);});
+    }
+  } catch(e) { alert('오류가 발생했습니다. 잠시 후 다시 시도해 주세요.'); }
+  finally { btn.disabled=false; btn.textContent='📤 익명으로 접수하기'; }
+}
+function closeSuccess() {
+  document.getElementById('doneOverlay').classList.remove('show');
+  document.getElementById('fbEmail').value='';
+  initForm();
+}
+
+// ── 관리자 PIN ──
+function openAdmin() {
+  pinBuf=''; updateDots();
+  document.getElementById('pinError').textContent='';
+  document.getElementById('pwScreen').style.display='block';
+  document.getElementById('adminScreen').style.display='none';
+  document.getElementById('adminModal').classList.add('show');
+}
+function closeAdmin() {
+  document.getElementById('adminModal').classList.remove('show');
+  pinBuf='';
+}
+function outsideClose(e) { if(e.target===document.getElementById('adminModal')) closeAdmin(); }
+function pinInput(v) {
+  if(pinBuf.length>=4) return;
+  pinBuf+=v; updateDots();
+  if(pinBuf.length===4) {
+    if(pinBuf==='3692') {
+      setTimeout(function(){
+        document.getElementById('pwScreen').style.display='none';
+        document.getElementById('adminScreen').style.display='block';
+        loadAdminUI();
+      },200);
+    } else {
+      document.getElementById('pinError').textContent='비밀번호가 올바르지 않습니다.';
+      setTimeout(function(){pinBuf='';updateDots();document.getElementById('pinError').textContent='';},900);
+    }
+  }
+}
+function pinClear() { if(pinBuf.length>0){pinBuf=pinBuf.slice(0,-1);updateDots();} }
+function updateDots() {
+  for(var i=0;i<4;i++) document.getElementById('d'+i).classList.toggle('filled',i<pinBuf.length);
+}
+
+// ── 관리자 설정 ──
+function getSaved() { try{return JSON.parse(localStorage.getItem('vocSettings')||'{}');}catch{return{};} }
+function loadAdminUI() {
+  var s=getSaved();
+  document.getElementById('bgUrl').value=s.bgUrl||'';
+  document.getElementById('bgDim').value=s.bgDim!=null?s.bgDim:30;
+  document.getElementById('dimVal').textContent=(s.bgDim!=null?s.bgDim:30)+'%';
+  // 저장된 base64 이미지 복원
+  if(s.bgBase64) {
+    window._bgBase64=s.bgBase64;
+    document.getElementById('filePreview').src=s.bgBase64;
+    document.getElementById('filePreviewWrap').style.display='block';
+    document.getElementById('fileLabelText').textContent='저장된 이미지';
+    switchBgTab('file');
+  } else {
+    window._bgBase64=null;
+  }
+  var hasBg=!!(s.bgUrl||(s.bgBase64));
+  document.getElementById('dimGroup').style.display=hasBg?'block':'none';
+  document.getElementById('fontSel').value=s.font||'Noto Sans KR';
+  document.getElementById('fontSz').value=s.fontSize||14;
+  document.getElementById('fontSzVal').textContent=(s.fontSize||14)+'px';
+  document.getElementById('spacing').value=s.spacing||0;
+  document.getElementById('spacingVal').textContent=(s.spacing||0)+'px';
+  curAlign=s.align||'left';
+  updateAlignBtns();
+  document.getElementById('splashTitleInput').value=s.splashTitle||'';
+  document.getElementById('splashSubInput').value=s.splashSub||'';
+  updatePreview();
+}
+function switchBgTab(tab) {
+  if(tab==='url') {
+    document.getElementById('bgUrlWrap').style.display='block';
+    document.getElementById('bgFileWrap').style.display='none';
+    document.getElementById('tabUrl').classList.add('active');
+    document.getElementById('tabFile').classList.remove('active');
+  } else {
+    document.getElementById('bgUrlWrap').style.display='none';
+    document.getElementById('bgFileWrap').style.display='block';
+    document.getElementById('tabUrl').classList.remove('active');
+    document.getElementById('tabFile').classList.add('active');
+  }
+  onBgChange();
+}
+function onBgChange() {
+  var url=document.getElementById('bgUrl').value.trim();
+  var hasFile=!!window._bgBase64;
+  document.getElementById('dimGroup').style.display=(url||hasFile)?'block':'none';
+}
+function onFileSelect(input) {
+  var file=input.files[0];
+  if(!file) return;
+  if(file.size>5*1024*1024){alert('5MB 이하 이미지만 업로드 가능합니다.');input.value='';return;}
+  var reader=new FileReader();
+  reader.onload=function(e){
+    // 모바일 최적화: 최대 1920px로 리사이즈
+    var img=new Image();
+    img.onload=function(){
+      var canvas=document.createElement('canvas');
+      var maxW=1920, maxH=1080;
+      var w=img.width, h=img.height;
+      if(w>maxW){h=Math.round(h*maxW/w);w=maxW;}
+      if(h>maxH){w=Math.round(w*maxH/h);h=maxH;}
+      canvas.width=w; canvas.height=h;
+      canvas.getContext('2d').drawImage(img,0,0,w,h);
+      // JPEG 품질 0.85로 압축
+      var dataUrl=canvas.toDataURL('image/jpeg',0.85);
+      window._bgBase64=dataUrl;
+      document.getElementById('filePreview').src=dataUrl;
+      document.getElementById('filePreviewWrap').style.display='block';
+      document.getElementById('fileLabelText').textContent=file.name;
+      onBgChange();
+    };
+    img.src=e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+function clearFile() {
+  window._bgBase64=null;
+  document.getElementById('bgFile').value='';
+  document.getElementById('filePreview').src='';
+  document.getElementById('filePreviewWrap').style.display='none';
+  document.getElementById('fileLabelText').textContent='JPG, JPEG, PNG, GIF, WEBP 선택';
+  onBgChange();
+}
+function updateDimVal() {
+  document.getElementById('dimVal').textContent=document.getElementById('bgDim').value+'%';
+}
+function updatePreview() {
+  var font=document.getElementById('fontSel').value;
+  var sz=document.getElementById('fontSz').value;
+  var sp=document.getElementById('spacing').value;
+  document.getElementById('fontSzVal').textContent=sz+'px';
+  document.getElementById('spacingVal').textContent=sp+'px';
+  var p=document.getElementById('previewBox');
+  p.style.fontSize=sz+'px';
+  p.style.fontFamily="'"+font+"',sans-serif";
+  p.style.letterSpacing=sp+'px';
+  p.style.textAlign=curAlign;
+}
+function setAlign(a) { curAlign=a; updateAlignBtns(); updatePreview(); }
+function updateAlignBtns() {
+  ['Left','Center','Right'].forEach(function(a){
+    var btn=document.getElementById('a'+a);
+    var isActive=curAlign===a.toLowerCase();
+    btn.classList.toggle('active',isActive);
+  });
+}
+
+// 밝기 감지 → 텍스트 색상 자동 변환
+function isDarkBg(dim) { return dim > 35; }
+
+function applySettings() {
+  var s=getSaved();
+  var app=document.getElementById('app');
+  var splash=document.getElementById('splash');
+  var splashOverlay=document.getElementById('splashOverlay');
+  var bgSrc=s.bgBase64||s.bgUrl||'';
+  if(bgSrc) {
+    // 앱 배경
+    app.style.backgroundImage="url('"+bgSrc+"')";
+    app.style.backgroundSize='cover';
+    app.style.backgroundPosition='center';
+    app.classList.add('has-bg');
+    var dim=(s.bgDim!=null?s.bgDim:30)/100;
+    document.getElementById('bgOverlay').style.background='rgba(0,0,0,'+dim+')';
+    document.querySelectorAll('.card').forEach(function(c){c.style.background='rgba(255,255,255,0.88)';});
+    // 스플래시 배경도 동일 이미지 적용
+    if(splash) {
+      splash.style.backgroundImage="url('"+bgSrc+"')";
+      var splashDim=Math.max(dim, 0.45);
+      splashOverlay.style.background='rgba(0,0,0,'+splashDim+')';
+    }
+  } else {
+    app.style.backgroundImage='';
+    app.classList.remove('has-bg');
+    document.getElementById('bgOverlay').style.background='';
+    document.querySelectorAll('.card').forEach(function(c){c.style.background='rgba(255,255,255,0.95)';});
+    // 스플래시는 기본 파일(splash_bg.jpeg) 유지
+    if(splash) {
+      splash.style.backgroundImage="url('./splash_bg.jpeg')";
+      splashOverlay.style.background='rgba(0,0,0,0.45)';
+    }
+  }
+  var fontFamily=s.font?"'"+s.font+"',sans-serif":null;
+  if(fontFamily) {
+    document.body.style.fontFamily=fontFamily;
+    document.querySelectorAll('.chip, textarea, .submit-btn, input').forEach(function(el){el.style.fontFamily=fontFamily;});
+  }
+  if(s.fontSize) {
+    document.querySelectorAll('.chip').forEach(function(el){el.style.fontSize=s.fontSize+'px';});
+  }
+  if(s.spacing) {
+    document.querySelectorAll('.chip').forEach(function(el){el.style.letterSpacing=s.spacing+'px';});
+  }
+  if(s.align) {
+    document.querySelectorAll('.chip-group').forEach(function(el){
+      el.style.justifyContent=s.align==='center'?'center':s.align==='right'?'flex-end':'flex-start';
+    });
+  }
+  // 스플래시 문구 적용
+  var titleEl=document.getElementById('splashTitle');
+  var subEl=document.getElementById('splashSub');
+  if(titleEl) titleEl.textContent=s.splashTitle||'포스코인터내셔널';
+  if(subEl) subEl.textContent=s.splashSub||'행정지원그룹';
+}
+
+function saveSettings() {
+  var s={
+    bgUrl: document.getElementById('bgUrlWrap').style.display!=='none'?document.getElementById('bgUrl').value.trim():'',
+    bgBase64: document.getElementById('bgFileWrap').style.display!=='none'?window._bgBase64||'':'',
+    bgDim: parseInt(document.getElementById('bgDim').value),
+    font: document.getElementById('fontSel').value,
+    fontSize: parseInt(document.getElementById('fontSz').value),
+    spacing: parseFloat(document.getElementById('spacing').value),
+    align: curAlign,
+    splashTitle: document.getElementById('splashTitleInput').value.trim(),
+    splashSub: document.getElementById('splashSubInput').value.trim()
+  };
+  localStorage.setItem('vocSettings', JSON.stringify(s));
+  applySettings();
+  closeAdmin();
+  var btn=document.querySelector('.admin-save-btn');
+  btn.textContent='✅ 저장 완료!';
+  setTimeout(function(){btn.textContent='✅ 설정 저장 및 적용';},1500);
+}
+function resetSettings() {
+  if(!confirm('설정을 기본값으로 초기화하시겠습니까?')) return;
+  localStorage.removeItem('vocSettings');
+  window._bgBase64=null;
+  var app=document.getElementById('app');
+  app.style.backgroundImage=''; app.classList.remove('has-bg');
+  document.getElementById('bgOverlay').style.background='';
+  document.body.style.fontFamily='';
+  document.querySelectorAll('.card').forEach(function(c){c.style.background='';});
+  document.querySelectorAll('.chip, textarea, .submit-btn, input').forEach(function(el){el.style.fontFamily='';el.style.fontSize='';el.style.letterSpacing='';});
+  switchBgTab('url');
+  var titleEl=document.getElementById('splashTitle');
+  var subEl=document.getElementById('splashSub');
+  if(titleEl) titleEl.textContent='포스코인터내셔널';
+  if(subEl) subEl.textContent='행정지원그룹';
+  loadAdminUI();
+}
+</script>
+</body>
+</html>
