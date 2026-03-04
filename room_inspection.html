@@ -370,9 +370,8 @@ function setImg(key, input) {
       ctx2.imageSmoothingEnabled = true;
       ctx2.imageSmoothingQuality = 'high';
       ctx2.drawImage(img, 0, 0, w, h);
-      // WebP 지원 시 WebP 사용 (더 선명하고 용량 작음)
-      const fmt = canvas.toDataURL('image/webp').startsWith('data:image/webp') ? 'image/webp' : 'image/jpeg';
-      const compressed = canvas.toDataURL(fmt, QUALITY);
+      // JPEG 고정 (사파리 호환성)
+      const compressed = canvas.toDataURL('image/jpeg', QUALITY);
       imgStore[key] = compressed;
       // 썸네일
       const thumb = document.getElementById(key+'-thumb');
