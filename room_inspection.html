@@ -1,4 +1,11 @@
 <html lang="ko"><head>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#003366">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="라운지점검">
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>비즈니스라운지 체크리스트 | 포스코인터내셔널</title>
@@ -557,6 +564,14 @@ function resetApp(){
   document.getElementById('page1').style.display='flex';
   window.scrollTo(0,0);
 }
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./service-worker.js')
+      .then(reg => console.log('✅ PWA 등록 완료'))
+      .catch(err => console.error('❌ 등록 실패:', err));
+  });
+}
+
 </script>
 
 
