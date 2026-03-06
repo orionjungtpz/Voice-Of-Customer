@@ -569,10 +569,6 @@ function fetchRssNews(cb) {
   var enabled = localStorage.getItem('voc_news_enabled');
   if(enabled === '0') { var b=document.getElementById('news-box'); if(b) b.style.display='none'; if(cb) cb(false); return; }
 
-  var POSCO_RSS = 'https://www.google.com/alerts/feeds/11413010082229595622/8909484378913146132';
-  var NEWS_RSS  = 'https://www.mk.co.kr/rss/30000001/';  // 매일경제 경제 (rss2json 호환)
-  var PROXY     = 'https://api.rss2json.com/v1/api.json?rss_url=';
-
   var box     = document.getElementById('news-box');
   var content = document.getElementById('news-content');
   var lbl     = document.getElementById('news-source-label');
@@ -581,48 +577,44 @@ function fetchRssNews(cb) {
   content.innerHTML = '<div style="font-size:12px;color:rgba(255,255,255,.4);">⏳ 뉴스 불러오는 중...</div>';
   box.style.display = 'block';
 
-  var poscoUrl = PROXY + encodeURIComponent(POSCO_RSS) + '&count=3';
-  var newsUrl  = PROXY + encodeURIComponent(NEWS_RSS)  + '&count=3';
+  // 캐시 무효화를 위해 날짜 쿼리 추가
+  var today = new Date().toISOString().slice(0,10).replace(/-/g,'');
+  fetch('./news.json?v=' + today)
+    .then(function(r) {
+      if(!r.ok) throw new Error('not found');
+      return r.json();
+    })
+    .then(function(data) {
+      var html = '';
+      var hasAny = false;
 
-  function renderItem(item) {
-    var title = item.title.replace(/<[^>]+>/g,'').replace(/&quot;/g,'"').replace(/&#39;/g,"'").replace(/&amp;/g,'&').trim();
-    var link  = item.link || '#';
-    return '<div style="padding:4px 0;border-bottom:1px solid rgba(255,255,255,.08);">'
-      + '<a href="'+link+'" target="_blank" style="color:#fff;text-decoration:none;font-size:12.5px;line-height:1.5;">• '+title+'</a>'
-      + '</div>';
-  }
+      (data.sections || []).forEach(function(sec) {
+        if(!sec.items || !sec.items.length) return;
+        hasAny = true;
+        html += '<div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.4);margin:8px 0 3px;letter-spacing:.3px;">'+sec.label+'</div>';
+        sec.items.forEach(function(item) {
+          html += '<div style="padding:4px 0;border-bottom:1px solid rgba(255,255,255,.08);">'
+            + '<a href="'+item.link+'" target="_blank" style="color:#fff;text-decoration:none;font-size:12.5px;line-height:1.5;">• '+item.title+'</a>'
+            + (item.pub ? '<span style="font-size:10px;color:rgba(255,255,255,.35);margin-left:6px;">'+item.pub+'</span>' : '')
+            + '</div>';
+        });
+      });
 
-  function sectionHeader(label) {
-    return '<div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.4);margin:8px 0 3px;letter-spacing:.3px;">'+label+'</div>';
-  }
-
-  Promise.allSettled([
-    fetch(poscoUrl).then(function(r){ return r.json(); }),
-    fetch(newsUrl).then(function(r){ return r.json(); })
-  ]).then(function(results) {
-    var poscoItems = (results[0].status==='fulfilled' && results[0].value.items) ? results[0].value.items.slice(0,3) : [];
-    var newsItems  = (results[1].status==='fulfilled' && results[1].value.items) ? results[1].value.items.slice(0,3) : [];
-
-    if(!poscoItems.length && !newsItems.length) {
-      content.innerHTML = '<div style="font-size:12px;color:rgba(255,255,255,.5);">⚠️ 뉴스를 불러올 수 없습니다.</div>';
-      if(cb) cb(false); return;
-    }
-
-    var html = '';
-    if(poscoItems.length) {
-      html += sectionHeader('📌 포스코인터내셔널');
-      html += poscoItems.map(renderItem).join('');
-    }
-    if(newsItems.length) {
-      html += sectionHeader('📰 매일경제');
-      html += newsItems.map(renderItem).join('');
-    }
-
-    content.innerHTML = html;
-    if(lbl) lbl.textContent = '';
-    box.style.display = 'block';
-    if(cb) cb(true);
-  });
+      if(!hasAny) {
+        content.innerHTML = '<div style="font-size:12px;color:rgba(255,255,255,.5);">오늘의 뉴스가 없습니다.</div>';
+      } else {
+        content.innerHTML = html;
+        if(lbl && data.updated) lbl.textContent = data.updated;
+      }
+      box.style.display = 'block';
+      if(cb) cb(true);
+    })
+    .catch(function() {
+      content.innerHTML = '<div style="font-size:12px;color:rgba(255,255,255,.4);">⏳ 뉴스 준비 중입니다.<br>'
+        + '<span style="font-size:11px;">매일 오전 8시 자동 업데이트됩니다.</span></div>';
+      box.style.display = 'block';
+      if(cb) cb(false);
+    });
 }
 
 function saveNews() {}   // 하위호환 (더 이상 사용 안 함)
