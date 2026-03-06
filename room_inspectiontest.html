@@ -514,6 +514,7 @@ function saveBldgName(i) {
 
 // ── 뉴스 RSS 피드 ──
 var RSS_SOURCES = [
+  { id:'posco_int', label:'📌 포스코인터내셔널', url:'https://www.google.com/alerts/feeds/11413010082229595622/8909484378913146132' },
   { id:'yonhap',   label:'연합뉴스 (속보)',   url:'https://www.yonhapnewstv.co.kr/browse/feed/' },
   { id:'naver_it', label:'네이버 IT/과학',     url:'https://feeds.feedburner.com/naverRssITnews' },
   { id:'mk',       label:'매일경제 (경제)',     url:'https://www.mk.co.kr/rss/30000001/' },
@@ -523,7 +524,7 @@ var RSS_SOURCES = [
 ];
 
 function buildRssSourceList() {
-  var saved = localStorage.getItem('voc_news_source') || 'yonhap';
+  var saved = localStorage.getItem('voc_news_source') || 'posco_int';
   var el = document.getElementById('rss-source-list');
   if(!el) return;
   el.innerHTML = RSS_SOURCES.map(function(s) {
@@ -567,9 +568,23 @@ function clearNewsSettings() {
 function fetchRssNews(cb) {
   var enabled = localStorage.getItem('voc_news_enabled');
   if(enabled === '0') { var b=document.getElementById('news-box'); if(b) b.style.display='none'; if(cb) cb(false); return; }
-  var srcId = localStorage.getItem('voc_news_source') || 'yonhap';
-  var cnt   = parseInt(localStorage.getItem('voc_news_count') || '7');
+  var srcId = localStorage.getItem('voc_news_source') || 'posco_int';
+  var cnt   = parseInt(localStorage.getItem('voc_news_count') || '5');
   var src   = RSS_SOURCES.filter(function(s){ return s.id===srcId; })[0] || RSS_SOURCES[0];
+  // 포스코인터내셔널 URL 미설정 시 안내
+  if(src.url === '__POSCO_ALERT_URL__') {
+    var box = document.getElementById('news-box');
+    var content = document.getElementById('news-content');
+    if(box && content) {
+      content.innerHTML = '<div style="font-size:12px;color:rgba(255,255,255,.6);line-height:1.7;">'
+        +'📌 Google Alerts RSS URL을 설정해주세요.<br>'
+        +'<span style="font-size:11px;opacity:.7;">google.com/alerts → "포스코인터내셔널" 검색어 → RSS 피드 생성<br>'
+        +'→ 관리 페이지에서 소스 URL 교체</span></div>';
+      box.style.display = 'block';
+    }
+    if(cb) cb(false);
+    return;
+  }
   var apiUrl = 'https://api.rss2json.com/v1/api.json?rss_url=' + encodeURIComponent(src.url) + '&count=' + cnt;
 
   function showError(msg) {
