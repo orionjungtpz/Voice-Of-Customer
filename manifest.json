@@ -1,27 +1,15 @@
 {
-  "name": "비즈니스라운지 체크리스트",
-  "short_name": "라운지점검",
-  "description": "포스코인터내셔널 포스코타워-송도 비즈니스라운지 체크리스트",
-  "start_url": "./room_inspection.html",
+  "name": "포스코인터내셔널 시설관리시스템",
+  "short_name": "시설관리시스템",
+  "start_url": "./room_inspectiontest.html",
   "display": "standalone",
-  "background_color": "#003366",
-  "theme_color": "#003366",
-  "orientation": "portrait",
-  "lang": "ko",
+  "background_color": "#003087",
+  "theme_color": "#003087",
   "icons": [
     {
       "src": "icon-192.png",
       "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
+      "type": "image/png"
     }
-  ],
-  "categories": ["productivity", "utilities"],
-  "scope": "./"
+  ]
 }
