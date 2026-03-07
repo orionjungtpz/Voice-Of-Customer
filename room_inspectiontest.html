@@ -515,7 +515,7 @@ function fetchStock() {
   if(!content) return;
 
   // range=5d: 장 마감 후에도 당일 종가 데이터 확보
-  var url = 'https://query1.finance.yahoo.com/v8/finance/chart/047050.KS?interval=1d&range=5d';
+  var url = 'https://corsproxy.io/?https://query1.finance.yahoo.com/v8/finance/chart/047050.KS?interval=1d&range=5d';
   fetch(url)
     .then(function(r){ if(!r.ok) throw new Error('http'); return r.json(); })
     .then(function(data) {
