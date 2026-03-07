@@ -374,18 +374,18 @@ function showStep(n) {
   if(n>=4) {
     // 관리자: 이전만 보임
     bar.className='bbar show';
-    btn.style.display=\'none\';
-    bbk.style.display=\'flex\';
+    btn.style.display='none';
+    bbk.style.display='flex';
   } else if(n===1) {
     // 건물선택: 버튼바 숨김
     bar.className='bbar';
-    btn.style.display=\'none\';
-    bbk.style.display=\'none\';
+    btn.style.display='none';
+    bbk.style.display='none';
   } else {
     bar.className='bbar show';
-    btn.style.display=\'flex\';
+    btn.style.display='flex';
     btn.disabled=(n===2)?!cZone:!cIns;
-    bbk.style.display=\'flex\';
+    bbk.style.display='flex';
   }
 }
 
@@ -738,7 +738,7 @@ function buildAdmZone() {
     var info=document.createElement('div'); info.style.flex='1';
     var nm=document.createElement('div'); nm.style.cssText='font-size:12px;font-weight:700;color:#fff;margin-bottom:6px;'; nm.textContent=displayName;
     var lbl=document.createElement('label'); lbl.className='adm-btn'; lbl.textContent='📷 변경';
-    var inp=document.createElement('input'); inp.type='file'; inp.accept='image/*'; inp.style.display=\'none\';
+    var inp=document.createElement('input'); inp.type='file'; inp.accept='image/*'; inp.style.display='none';
     (function(zone){ inp.addEventListener('change',function(){uploadZone(zone,inp);}); })(z);
     lbl.appendChild(inp);
     var rst=document.createElement('button'); rst.className='adm-reset'; rst.textContent='초기화';
@@ -792,7 +792,7 @@ function buildAdmIns() {
     var info=document.createElement('div'); info.style.flex='1';
     var nm=document.createElement('div'); nm.style.cssText='font-size:12px;font-weight:700;color:#fff;margin-bottom:6px;'; nm.textContent=p;
     var lbl=document.createElement('label'); lbl.className='adm-btn'; lbl.textContent='📷 변경';
-    var inp=document.createElement('input'); inp.type='file'; inp.accept='image/*'; inp.style.display=\'none\';
+    var inp=document.createElement('input'); inp.type='file'; inp.accept='image/*'; inp.style.display='none';
     (function(name){ inp.addEventListener('change',function(){uploadIns(name,inp);}); })(p);
     lbl.appendChild(inp);
     var rst=document.createElement('button'); rst.className='adm-reset'; rst.textContent='초기화';
@@ -930,7 +930,7 @@ function applyBldgImg(i, src) {
   imgStore['bldg'+i]=src;
   var im=document.getElementById('bim'+i), em=document.getElementById('bem'+i);
   if(im){im.src=src;im.style.display='block';}
-  if(em) em.style.display=\'none\';
+  if(em) em.style.display='none';
 }
 
 // ── page2 ──
