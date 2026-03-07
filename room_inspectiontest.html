@@ -445,8 +445,7 @@ function selZone(name, el) {
     if(lsSrc){
       av='<img src="'+lsSrc+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">';
     } else {
-      av='<img src="'+photoSrc+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" '
-        +'onerror="this.style.display=&quot;none&quot;;this.nextSibling.style.display=&quot;flex&quot;;">'
+      av='<img src="'+photoSrc+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" onerror="this.onerror=null;this.style.cssText=\'display:none\';">'
         +'<span style="display:none;width:100%;height:100%;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff;">'+initials+'</span>';
     }
     return '<div class="ins-card" onclick="selIns(\''+p+'\',this)"><div class="ins-av" style="overflow:hidden;position:relative;display:flex;align-items:center;justify-content:center;">'+av+'</div><div class="ins-nm">'+p+'</div></div>';
