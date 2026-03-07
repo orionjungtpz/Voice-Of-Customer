@@ -484,8 +484,7 @@ function buildAdmBldg() {
   var ni=document.getElementById('btn-next-text');
   if(bi) bi.value=localStorage.getItem('voc_btn_back')||'';
   if(ni) ni.value=localStorage.getItem('voc_btn_next')||'';
-  // 뉴스 RSS 소스 선택 UI 빌드
-  buildRssSourceList();
+ 
   var list=document.getElementById('adm-bldg');
   list.innerHTML=BLDG_NAMES.map(function(n,i) {
     var src=imgStore['bldg'+i]||'';
