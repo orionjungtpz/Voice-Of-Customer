@@ -358,7 +358,7 @@ window.onload = function() {
  setTimeout(function() {
   var s=document.getElementById('splash');
   s.classList.add('hide');
-  setTimeout(function(){s.style.display='none';},700);
+  setTimeout(function(){s.style.display=\'none\';},700);
 }, 2500);
 };
 
@@ -374,18 +374,18 @@ function showStep(n) {
   if(n>=4) {
     // 관리자: 이전만 보임
     bar.className='bbar show';
-    btn.style.display='none';
-    bbk.style.display='flex';
+    btn.style.display=\'none\';
+    bbk.style.display=\'flex\';
   } else if(n===1) {
     // 건물선택: 버튼바 숨김
     bar.className='bbar';
-    btn.style.display='none';
-    bbk.style.display='none';
+    btn.style.display=\'none\';
+    bbk.style.display=\'none\';
   } else {
     bar.className='bbar show';
-    btn.style.display='flex';
+    btn.style.display=\'flex\';
     btn.disabled=(n===2)?!cZone:!cIns;
-    bbk.style.display='flex';
+    bbk.style.display=\'flex\';
   }
 }
 
@@ -739,7 +739,7 @@ function buildAdmZone() {
     var info=document.createElement('div'); info.style.flex='1';
     var nm=document.createElement('div'); nm.style.cssText='font-size:12px;font-weight:700;color:#fff;margin-bottom:6px;'; nm.textContent=displayName;
     var lbl=document.createElement('label'); lbl.className='adm-btn'; lbl.textContent='📷 변경';
-    var inp=document.createElement('input'); inp.type='file'; inp.accept='image/*'; inp.style.display='none';
+    var inp=document.createElement('input'); inp.type='file'; inp.accept='image/*'; inp.style.display=\'none\';
     (function(zone){ inp.addEventListener('change',function(){uploadZone(zone,inp);}); })(z);
     lbl.appendChild(inp);
     var rst=document.createElement('button'); rst.className='adm-reset'; rst.textContent='초기화';
@@ -793,7 +793,7 @@ function buildAdmIns() {
     var info=document.createElement('div'); info.style.flex='1';
     var nm=document.createElement('div'); nm.style.cssText='font-size:12px;font-weight:700;color:#fff;margin-bottom:6px;'; nm.textContent=p;
     var lbl=document.createElement('label'); lbl.className='adm-btn'; lbl.textContent='📷 변경';
-    var inp=document.createElement('input'); inp.type='file'; inp.accept='image/*'; inp.style.display='none';
+    var inp=document.createElement('input'); inp.type='file'; inp.accept='image/*'; inp.style.display=\'none\';
     (function(name){ inp.addEventListener('change',function(){uploadIns(name,inp);}); })(p);
     lbl.appendChild(inp);
     var rst=document.createElement('button'); rst.className='adm-reset'; rst.textContent='초기화';
@@ -931,7 +931,7 @@ function applyBldgImg(i, src) {
   imgStore['bldg'+i]=src;
   var im=document.getElementById('bim'+i), em=document.getElementById('bem'+i);
   if(im){im.src=src;im.style.display='block';}
-  if(em) em.style.display='none';
+  if(em) em.style.display=\'none\';
 }
 
 // ── page2 ──
@@ -943,14 +943,14 @@ function goPage2() {
   document.getElementById('p2z').textContent='📍 '+cZone;
   document.getElementById('p2i').textContent='👤 '+cIns;
   document.getElementById('p2d').textContent='📅 '+dt;
-  document.getElementById('page1').style.display='none';
-  document.getElementById('page2').style.display='flex';
+  document.getElementById('page1').style.display=\'none\';
+  document.getElementById('page2').style.display=\'flex\';
   if(!cfg) {
-    document.getElementById('twrap').style.display='none';
-    document.getElementById('wip').style.display='flex';
+    document.getElementById('twrap').style.display=\'none\';
+    document.getElementById('wip').style.display=\'flex\';
   } else {
     document.getElementById('twrap').style.display='';
-    document.getElementById('wip').style.display='none';
+    document.getElementById('wip').style.display=\'none\';
     curItems=cfg.items; curItemNames=cfg.itemNames; curSeatMap=cfg.seatMap; curRooms=cfg.rooms;
     state={}; Object.keys(photoStore).forEach(function(k){delete photoStore[k];});
     var thr=document.getElementById('thr');
@@ -960,8 +960,8 @@ function goPage2() {
   window.scrollTo(0,0);
 }
 function goPage1() {
-  document.getElementById('page2').style.display='none';
-  document.getElementById('page1').style.display='flex';
+  document.getElementById('page2').style.display=\'none\';
+  document.getElementById('page1').style.display=\'flex\';
   showStep(3);
 }
 
@@ -998,7 +998,7 @@ function buildTable() {
       var wrap=document.createElement('div'); wrap.style.cssText='display:flex;align-items:center;gap:3px;';
       var ni=document.createElement('input'); ni.className='ni'; ni.id='note-'+rid; ni.placeholder='비고'; ni.style.cssText='flex:1;min-width:0;';
       var lbl=document.createElement('label'); lbl.style.cssText='cursor:pointer;font-size:14px;flex-shrink:0;'; lbl.textContent='📷';
-      var finp=document.createElement('input'); finp.type='file'; finp.accept='image/*'; finp.setAttribute('capture','environment'); finp.style.display='none';
+      var finp=document.createElement('input'); finp.type='file'; finp.accept='image/*'; finp.setAttribute('capture','environment'); finp.style.display=\'none\';
       (function(ri){ finp.addEventListener('change',function(){addPhoto(ri,finp);}); })(rid);
       lbl.appendChild(finp);
       wrap.appendChild(ni); wrap.appendChild(lbl);
@@ -1089,8 +1089,8 @@ function doSubmit() {
 
 function resetApp() {
   document.getElementById('ov-done').classList.remove('show');
-  document.getElementById('page2').style.display='none';
-  document.getElementById('page1').style.display='flex';
+  document.getElementById('page2').style.display=\'none\';
+  document.getElementById('page1').style.display=\'flex\';
   cBldg=''; cZone=''; cIns=''; state={};
   document.querySelectorAll('.sel-card,.ins-card').forEach(function(c){c.classList.remove('selected');});
   showStep(1);
