@@ -356,10 +356,10 @@ window.onload = function() {
   fetchWeather();
   showStep(1);
   setTimeout(function() {
-    var s=document.getElementById('splash');
-    s.style.opacity='0'; s.style.transition='opacity .6s';
-    setTimeout(function(){s.style.display='none';},700);
-  }, 2500);
+  var s=document.getElementById('splash');
+  s.classList.add('hide');
+  setTimeout(function(){s.style.display='none';},700);
+}, 2500);
 };
 
 function showStep(n) {
