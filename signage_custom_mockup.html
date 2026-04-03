@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>회의실 사이니지 — Lenovo Mockup</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html,body{
+    width:100vw;height:100vh;overflow:hidden;
+    background:#111;
+    display:flex;align-items:center;justify-content:center;
+  }
+  body::before{
+    content:'';position:fixed;inset:0;
+    background:radial-gradient(ellipse 80% 60% at 50% 50%, #1a1a2e 0%, #0a0a0a 100%);
+    z-index:0;
+  }
+  .scene{position:relative;z-index:1;}
+
+  /* ── 레노버 태블릿 프레임 ── */
+  .tablet{
+    position:relative;
+    width:960px;height:640px;
+    background:linear-gradient(160deg, #2e2e2e 0%, #1c1c1c 40%, #252525 100%);
+    border-radius:22px;
+    box-shadow:
+      0 0 0 1px #111,
+      0 0 0 2px #3a3a3a,
+      0 40px 100px rgba(0,0,0,0.8),
+      0 10px 30px rgba(0,0,0,0.6),
+      inset 0 1px 0 rgba(255,255,255,0.08);
+    padding:18px;
+  }
+  .tablet::before{
+    content:'';position:absolute;
+    left:-3px;top:120px;width:3px;height:44px;
+    background:linear-gradient(to bottom,#2a2a2a,#333,#2a2a2a);
+    border-radius:2px 0 0 2px;box-shadow:-1px 0 3px rgba(0,0,0,0.5);
+  }
+  .tablet::after{
+    content:'';position:absolute;
+    right:-3px;top:100px;width:3px;height:60px;
+    background:linear-gradient(to bottom,#2a2a2a,#333,#2a2a2a);
+    border-radius:0 2px 2px 0;box-shadow:1px 0 3px rgba(0,0,0,0.5);
+  }
+  .camera-bar{position:absolute;top:7px;left:50%;transform:translateX(-50%);}
+  .camera{width:9px;height:9px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#3a3a3a,#111);border:1px solid #0a0a0a;box-shadow:0 0 0 1px rgba(255,255,255,0.05);}
+  .lenovo-logo{position:absolute;bottom:6px;left:50%;transform:translateX(-50%);font-size:9px;font-weight:700;letter-spacing:3px;color:#3a3a3a;text-transform:uppercase;font-family:sans-serif;}
+
+  /* LED — 빨간색 (사용 중) */
+  .led-strip{
+    position:absolute;left:-5px;top:30%;bottom:30%;width:4px;
+    background:linear-gradient(to bottom,transparent 0%,#e63946 20%,#ff5566 50%,#e63946 80%,transparent 100%);
+    border-radius:2px;filter:blur(0.5px);
+    box-shadow:0 0 8px #e63946,0 0 16px rgba(230,57,70,0.4);
+    animation:ledPulse 2s ease-in-out infinite;
+  }
+  @keyframes ledPulse{
+    0%,100%{opacity:0.7;box-shadow:0 0 6px #e63946,0 0 12px rgba(230,57,70,0.3);}
+    50%{opacity:1;box-shadow:0 0 12px #e63946,0 0 24px rgba(230,57,70,0.5);}
+  }
+
+  /* 스크린 */
+  .screen{
+    width:100%;height:100%;
+    background:#000;border-radius:8px;overflow:hidden;
+    box-shadow:inset 0 0 0 1px rgba(0,0,0,0.8);
+    position:relative;
+  }
+
+  /* 사이니지를 인라인으로 스케일 */
+  .screen-inner{
+    width:1280px;height:800px;
+    transform-origin:top left;
+    transform:scale(0.726);
+    position:absolute;top:0;left:0;
+  }
+
+  .stand-shadow{position:absolute;bottom:-24px;left:10%;right:10%;height:24px;background:radial-gradient(ellipse at center,rgba(0,0,0,0.6) 0%,transparent 70%);filter:blur(8px);}
+  .desk{position:absolute;bottom:-8px;left:-60px;right:-60px;height:1px;background:linear-gradient(to right,transparent,rgba(255,255,255,0.06),transparent);}
+
+  /* ── 사이니지 내부 CSS ── */
+  .screen-inner *{box-sizing:border-box;margin:0;padding:0;}
+  .screen-inner,
+  .screen-inner body{width:1280px;height:800px;overflow:hidden;font-family:'Outfit','Apple SD Gothic Neo','Malgun Gothic',sans-serif;background:#000;color:#fff;}
+  #signage{width:1280px;height:800px;position:relative;overflow:hidden;}
+  .s-bg{position:absolute;inset:0;z-index:0;background:radial-gradient(ellipse 70% 55% at 18% 105%,rgba(0,48,135,0.75) 0%,transparent 58%),radial-gradient(ellipse 55% 45% at 82% -5%,rgba(75,15,95,0.55) 0%,transparent 52%),radial-gradient(ellipse 45% 55% at 58% 85%,rgba(150,55,8,0.42) 0%,transparent 48%),linear-gradient(148deg,#160820 0%,#0b1828 45%,#180c06 100%);}
+  .el{position:absolute;cursor:default;}
+  .qr-inner{display:flex;align-items:center;gap:12px;background:rgba(16,14,30,0.85);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,0.1);border-radius:14px;padding:10px 18px 10px 12px;}
+  .qr-right{display:flex;flex-direction:column;gap:5px;}
+  .qr-badge{background:rgba(0,196,113,0.18);border:1px solid rgba(0,196,113,0.38);border-radius:20px;padding:2px 10px;font-size:10px;font-weight:700;color:#00c471;letter-spacing:1px;}
+  .qr-hint{font-size:11px;color:rgba(255,255,255,0.5);white-space:nowrap;}
+  .clock-time-txt{font-family:'DM Mono',monospace;font-size:52px;font-weight:500;line-height:1;letter-spacing:-2px;color:#fff;}
+  .clock-date-txt{font-size:13px;color:rgba(255,255,255,0.5);margin-top:6px;}
+  #el-floor{display:flex;align-items:center;gap:10px;}
+  .floor-line-el{height:2.5px;background:#00c471;border-radius:2px;width:26px;}
+  .floor-label-el{font-size:13px;font-weight:700;letter-spacing:3px;color:#00c471;text-transform:uppercase;}
+  .room-name-txt{font-size:58px;font-weight:800;line-height:1;letter-spacing:-1.5px;white-space:nowrap;color:#fff;}
+  .notice-inner{display:inline-flex;align-items:center;gap:9px;background:rgba(230,57,70,0.13);border:1px solid rgba(230,57,70,0.32);border-radius:30px;padding:8px 18px;font-size:13px;font-weight:500;color:#f87171;}
+  .notice-dot{width:7px;height:7px;border-radius:50%;background:#e63946;animation:pulse 1.8s ease-in-out infinite;flex-shrink:0;}
+  @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.35;transform:scale(0.75)}}
+  #el-amenities{display:flex;gap:22px;align-items:center;}
+  .amenity-chip{display:flex;align-items:center;gap:6px;font-size:12px;color:rgba(255,255,255,0.5);}
+  #el-contact{font-size:11px;color:rgba(255,255,255,0.28);}
+  #el-statuscard{background:rgba(16,14,26,0.88);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,0.08);border-radius:20px;padding:26px 26px 22px;overflow:hidden;}
+  #el-statuscard::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;background:#e63946;border-radius:20px 0 0 20px;}
+  .sc-glow{position:absolute;right:-30px;top:-30px;width:140px;height:140px;border-radius:50%;background:rgba(230,57,70,0.18);filter:blur(28px);}
+  .sc-eye{display:flex;align-items:center;gap:8px;margin-bottom:12px;position:relative;z-index:1;}
+  .sc-dot{width:8px;height:8px;border-radius:50%;background:#e63946;animation:pulse 1.8s ease-in-out infinite;}
+  .sc-lbl{font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#e63946;}
+  .sc-title{font-size:26px;font-weight:800;line-height:1.15;margin-bottom:8px;position:relative;z-index:1;letter-spacing:-0.5px;}
+  .sc-time{font-family:'DM Mono',monospace;font-size:13px;color:rgba(255,255,255,0.5);position:relative;z-index:1;margin-bottom:16px;}
+  .sc-meta{display:flex;gap:20px;position:relative;z-index:1;padding-top:14px;border-top:1px solid rgba(255,255,255,0.08);}
+  .sc-meta-item{display:flex;align-items:center;gap:7px;font-size:13px;color:rgba(255,255,255,0.5);}
+  #el-schedule{background:rgba(16,14,26,0.88);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:20px 22px;}
+  .sch-lbl{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.28);margin-bottom:16px;}
+  .sch-item{display:flex;align-items:stretch;gap:13px;padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.05);}
+  .sch-item:last-child{border-bottom:none;padding-bottom:0;}
+  .sch-bar{width:3px;border-radius:2px;flex-shrink:0;}
+  .sch-bar.busy{background:#e63946;}.sch-bar.upcoming{background:#4488ff;}
+  .sch-info{flex:1;}
+  .sch-title-txt{font-size:13px;font-weight:600;color:#fff;margin-bottom:4px;line-height:1.2;}
+  .sch-time-txt{font-family:'DM Mono',monospace;font-size:11px;color:rgba(255,255,255,0.5);}
+</style>
+</head>
+<body>
+<div class="scene">
+  <div class="tablet">
+    <div class="camera-bar"><div class="camera"></div></div>
+    <div class="lenovo-logo">Lenovo</div>
+    <div class="led-strip"></div>
+
+    <div class="screen">
+      <div class="screen-inner">
+        <div id="signage">
+          <div class="s-bg"></div>
+
+          <!-- QR -->
+          <div class="el" id="el-qr" style="left:40px;top:37px;transform:scale(1.4);transform-origin:left top;">
+            <div class="qr-inner">
+              <div class="qr-svg-wrap">
+                <svg id="qr-svg" width="46" height="46" viewBox="0 0 60 60" style="background:#fff;padding:4px;border-radius:4px;display:block;">
+                  <rect width="60" height="60" fill="white"/>
+                  <rect x="4" y="4" width="18" height="18" fill="black" rx="2"/><rect x="6" y="6" width="14" height="14" fill="white" rx="1"/><rect x="8" y="8" width="10" height="10" fill="black" rx="1"/>
+                  <rect x="38" y="4" width="18" height="18" fill="black" rx="2"/><rect x="40" y="6" width="14" height="14" fill="white" rx="1"/><rect x="42" y="8" width="10" height="10" fill="black" rx="1"/>
+                  <rect x="4" y="38" width="18" height="18" fill="black" rx="2"/><rect x="6" y="40" width="14" height="14" fill="white" rx="1"/><rect x="8" y="42" width="10" height="10" fill="black" rx="1"/>
+                  <rect x="26" y="4" width="4" height="4" fill="black"/><rect x="32" y="4" width="4" height="4" fill="black"/>
+                  <rect x="26" y="10" width="4" height="4" fill="black"/><rect x="32" y="14" width="4" height="4" fill="black"/>
+                  <rect x="26" y="26" width="4" height="4" fill="black"/><rect x="32" y="26" width="4" height="4" fill="black"/>
+                  <rect x="38" y="26" width="4" height="4" fill="black"/><rect x="44" y="26" width="4" height="4" fill="black"/>
+                  <rect x="50" y="26" width="4" height="4" fill="black"/><rect x="26" y="32" width="4" height="4" fill="black"/>
+                  <rect x="44" y="32" width="4" height="4" fill="black"/><rect x="26" y="38" width="4" height="4" fill="black"/>
+                  <rect x="32" y="38" width="4" height="4" fill="black"/><rect x="50" y="38" width="4" height="4" fill="black"/>
+                  <rect x="4" y="26" width="4" height="4" fill="black"/><rect x="10" y="26" width="4" height="4" fill="black"/>
+                  <rect x="16" y="26" width="4" height="4" fill="black"/><rect x="4" y="32" width="4" height="4" fill="black"/>
+                  <rect x="16" y="32" width="4" height="4" fill="black"/>
+                </svg>
+              </div>
+              <div class="qr-right">
+                <div class="qr-badge">비품 요청</div>
+                <div class="qr-hint">탭하여 요청하기</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 시계 -->
+          <div class="el" id="el-clock" style="left:1060px;top:22px;">
+            <div class="clock-time-txt" id="clockTime" style="text-align:center;font-size:48px;">--:--</div>
+            <div class="clock-date-txt" id="clockDate" style="font-size:16px;">-</div>
+          </div>
+
+          <!-- 층 레이블 -->
+          <div class="el" id="el-floor" style="left:53px;top:165px;">
+            <div class="floor-line-el" id="floor-line"></div>
+            <div class="floor-label-el" style="font-size:28px;">9F · 교육장 1</div>
+          </div>
+
+          <!-- 회의 제목 -->
+          <div class="el" id="el-roomname" style="top:268px;left:49px;">
+            <div class="room-name-txt" style="font-size:65px;">비즈니스라운지 리뉴얼 회의</div>
+          </div>
+
+          <!-- 공지 -->
+          <div class="el" id="el-notice" style="left:58px;top:379px;">
+            <div class="notice-inner">
+              <div class="notice-dot"></div>
+              <span style="font-size:16px;">행정지원그룹 / 혜인에스엔에스</span>
+            </div>
+          </div>
+
+          <!-- 설비 -->
+          <div class="el" id="el-amenities" style="left:48px;top:687px;">
+            <div class="amenity-chip" style="font-size:15px;">📺 <span>프로젝터</span></div>
+            <div class="amenity-chip" style="font-size:15px;">🔊 <span>음향</span></div>
+            <div class="amenity-chip" style="font-size:15px;">📡 <span>화상회의</span></div>
+            <div class="amenity-chip" style="font-size:15px;">🖊️ <span>화이트보드</span></div>
+          </div>
+
+          <!-- 연락처 -->
+          <div class="el" id="el-contact" style="left:56px;top:731px;">
+            <span style="font-size:16px;">행정지원그룹 · 내선 3692</span>
+          </div>
+
+          <!-- 상태 카드 -->
+          <div class="el" id="el-statuscard" style="left:863px;top:143px;width:400px;">
+            <div class="sc-glow"></div>
+            <div class="sc-eye">
+              <div class="sc-dot"></div>
+              <div class="sc-lbl" style="font-size:14px;">사용 중</div>
+            </div>
+            <div class="sc-title" style="font-size:28px;">9층 비즈니스라운지 리뉴얼</div>
+            <div class="sc-time" style="font-size:16px;">09:00 – 10:20</div>
+            <div class="sc-meta">
+              <div class="sc-meta-item">👤 <span>한승호</span></div>
+              <div class="sc-meta-item">👥 <span>행정지원그룹</span></div>
+            </div>
+          </div>
+
+          <!-- 일정 카드 -->
+          <div class="el" id="el-schedule" style="left:851px;top:371px;">
+            <div class="sch-lbl">오늘 일정</div>
+            <div class="sch-item"><div class="sch-bar busy"></div><div class="sch-info"><div class="sch-title-txt" style="font-size:19px;">제 26기 정기 주주총회</div><div class="sch-time-txt" style="font-size:14px;">09:00 – 10:20 · IR담당</div></div></div>
+            <div class="sch-item"><div class="sch-bar upcoming"></div><div class="sch-info"><div class="sch-title-txt" style="font-size:19px;">이사회 보고</div><div class="sch-time-txt" style="font-size:14px;">11:00 – 12:30 · 경영기획팀</div></div></div>
+            <div class="sch-item"><div class="sch-bar upcoming"></div><div class="sch-info"><div class="sch-title-txt" style="font-size:19px;">임원 간담회</div><div class="sch-time-txt" style="font-size:14px;">14:00 – 15:00 · 대표이사실</div></div></div>
+          </div>
+
+        </div><!-- /signage -->
+      </div><!-- /screen-inner -->
+    </div><!-- /screen -->
+
+    <div class="stand-shadow"></div>
+    <div class="desk"></div>
+  </div><!-- /tablet -->
+</div><!-- /scene -->
+
+<!-- ── 비품 요청 오버레이 ── -->
+<div id="supplyOverlay" onclick="closeSupplyOutside(event)" style="
+  position:fixed;inset:0;z-index:100;
+  background:rgba(0,0,0,0.65);backdrop-filter:blur(6px);
+  opacity:0;pointer-events:none;transition:opacity 0.3s;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Outfit','Apple SD Gothic Neo','Malgun Gothic',sans-serif;
+">
+  <div id="supplyPanel" style="
+    background:rgba(12,11,22,0.98);border:1px solid rgba(255,255,255,0.1);
+    border-radius:24px;width:620px;padding:40px;
+    display:flex;flex-direction:column;gap:18px;
+    transform:scale(0.92) translateY(18px);
+    transition:transform 0.4s cubic-bezier(0.32,0.72,0,1);
+    box-shadow:0 40px 80px rgba(0,0,0,0.7);color:#fff;
+  ">
+    <div id="spForm">
+      <!-- 헤더 -->
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px;">
+        <div>
+          <div style="font-size:11px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:#00c471;margin-bottom:6px;">비품 요청</div>
+          <div style="font-size:22px;font-weight:800;">필요한 물품을 선택해주세요</div>
+          <div style="font-size:13px;color:rgba(255,255,255,0.5);margin-top:4px;">📍 교육장 1 · 9F</div>
+        </div>
+        <div onclick="closeSupply()" style="width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.08);color:rgba(255,255,255,0.5);font-size:15px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;">✕</div>
+      </div>
+
+      <!-- 비품 그리드 -->
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px;" id="spGrid">
+        <div class="sp-item" onclick="toggleItem(this)" data-item="A4 용지"       style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:16px 14px;cursor:pointer;transition:all 0.15s;position:relative;">
+          <div class="sp-check" style="position:absolute;top:10px;right:10px;width:18px;height:18px;border-radius:50%;background:#00c471;display:flex;align-items:center;justify-content:center;font-size:10px;color:#000;font-weight:700;opacity:0;transform:scale(0.5);transition:all 0.15s;">✓</div>
+          <div style="font-size:22px;margin-bottom:5px;">📄</div><div style="font-size:13px;font-weight:600;">A4 용지</div><div style="font-size:11px;color:rgba(255,255,255,0.5);">복사·출력용</div>
+        </div>
+        <div class="sp-item" onclick="toggleItem(this)" data-item="화이트보드 마커" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:16px 14px;cursor:pointer;transition:all 0.15s;position:relative;">
+          <div class="sp-check" style="position:absolute;top:10px;right:10px;width:18px;height:18px;border-radius:50%;background:#00c471;display:flex;align-items:center;justify-content:center;font-size:10px;color:#000;font-weight:700;opacity:0;transform:scale(0.5);transition:all 0.15s;">✓</div>
+          <div style="font-size:22px;margin-bottom:5px;">🖊️</div><div style="font-size:13px;font-weight:600;">화이트보드 마커</div><div style="font-size:11px;color:rgba(255,255,255,0.5);">색상 무관</div>
+        </div>
+        <div class="sp-item" onclick="toggleItem(this)" data-item="포스트잇"       style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:16px 14px;cursor:pointer;transition:all 0.15s;position:relative;">
+          <div class="sp-check" style="position:absolute;top:10px;right:10px;width:18px;height:18px;border-radius:50%;background:#00c471;display:flex;align-items:center;justify-content:center;font-size:10px;color:#000;font-weight:700;opacity:0;transform:scale(0.5);transition:all 0.15s;">✓</div>
+          <div style="font-size:22px;margin-bottom:5px;">🟨</div><div style="font-size:13px;font-weight:600;">포스트잇</div><div style="font-size:11px;color:rgba(255,255,255,0.5);">메모용</div>
+        </div>
+        <div class="sp-item" onclick="toggleItem(this)" data-item="볼펜"           style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:16px 14px;cursor:pointer;transition:all 0.15s;position:relative;">
+          <div class="sp-check" style="position:absolute;top:10px;right:10px;width:18px;height:18px;border-radius:50%;background:#00c471;display:flex;align-items:center;justify-content:center;font-size:10px;color:#000;font-weight:700;opacity:0;transform:scale(0.5);transition:all 0.15s;">✓</div>
+          <div style="font-size:22px;margin-bottom:5px;">✒️</div><div style="font-size:13px;font-weight:600;">볼펜</div><div style="font-size:11px;color:rgba(255,255,255,0.5);">필기구</div>
+        </div>
+        <div class="sp-item" onclick="toggleItem(this)" data-item="생수"           style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:16px 14px;cursor:pointer;transition:all 0.15s;position:relative;">
+          <div class="sp-check" style="position:absolute;top:10px;right:10px;width:18px;height:18px;border-radius:50%;background:#00c471;display:flex;align-items:center;justify-content:center;font-size:10px;color:#000;font-weight:700;opacity:0;transform:scale(0.5);transition:all 0.15s;">✓</div>
+          <div style="font-size:22px;margin-bottom:5px;">💧</div><div style="font-size:13px;font-weight:600;">생수</div><div style="font-size:11px;color:rgba(255,255,255,0.5);">500ml</div>
+        </div>
+        <div class="sp-item" onclick="toggleItem(this)" data-item="멀티탭"         style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:16px 14px;cursor:pointer;transition:all 0.15s;position:relative;">
+          <div class="sp-check" style="position:absolute;top:10px;right:10px;width:18px;height:18px;border-radius:50%;background:#00c471;display:flex;align-items:center;justify-content:center;font-size:10px;color:#000;font-weight:700;opacity:0;transform:scale(0.5);transition:all 0.15s;">✓</div>
+          <div style="font-size:22px;margin-bottom:5px;">🔌</div><div style="font-size:13px;font-weight:600;">멀티탭</div><div style="font-size:11px;color:rgba(255,255,255,0.5);">전원 확장</div>
+        </div>
+        <div class="sp-item" onclick="toggleItem(this)" data-item="HDMI 케이블"    style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:16px 14px;cursor:pointer;transition:all 0.15s;position:relative;">
+          <div class="sp-check" style="position:absolute;top:10px;right:10px;width:18px;height:18px;border-radius:50%;background:#00c471;display:flex;align-items:center;justify-content:center;font-size:10px;color:#000;font-weight:700;opacity:0;transform:scale(0.5);transition:all 0.15s;">✓</div>
+          <div style="font-size:22px;margin-bottom:5px;">🖥️</div><div style="font-size:13px;font-weight:600;">HDMI 케이블</div><div style="font-size:11px;color:rgba(255,255,255,0.5);">영상 연결</div>
+        </div>
+        <div class="sp-item" onclick="toggleItem(this)" data-item="레이저 포인터"  style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:16px 14px;cursor:pointer;transition:all 0.15s;position:relative;">
+          <div class="sp-check" style="position:absolute;top:10px;right:10px;width:18px;height:18px;border-radius:50%;background:#00c471;display:flex;align-items:center;justify-content:center;font-size:10px;color:#000;font-weight:700;opacity:0;transform:scale(0.5);transition:all 0.15s;">✓</div>
+          <div style="font-size:22px;margin-bottom:5px;">🔦</div><div style="font-size:13px;font-weight:600;">레이저 포인터</div><div style="font-size:11px;color:rgba(255,255,255,0.5);">발표용</div>
+        </div>
+        <div class="sp-item" onclick="toggleItem(this)" data-item="기타"           style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:16px 14px;cursor:pointer;transition:all 0.15s;position:relative;">
+          <div class="sp-check" style="position:absolute;top:10px;right:10px;width:18px;height:18px;border-radius:50%;background:#00c471;display:flex;align-items:center;justify-content:center;font-size:10px;color:#000;font-weight:700;opacity:0;transform:scale(0.5);transition:all 0.15s;">✓</div>
+          <div style="font-size:22px;margin-bottom:5px;">📦</div><div style="font-size:13px;font-weight:600;">기타</div><div style="font-size:11px;color:rgba(255,255,255,0.5);">직접 입력</div>
+        </div>
+      </div>
+
+      <!-- 수량 -->
+      <div style="display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:10px 16px;margin-bottom:12px;">
+        <span style="font-size:13px;color:rgba(255,255,255,0.5);">수량</span>
+        <div style="display:flex;align-items:center;gap:14px;">
+          <div onclick="changeQty(-1)" style="width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.08);color:#fff;font-size:16px;display:flex;align-items:center;justify-content:center;cursor:pointer;">−</div>
+          <div id="spQty" style="font-family:'DM Mono',monospace;font-size:18px;font-weight:600;min-width:24px;text-align:center;">1</div>
+          <div onclick="changeQty(1)"  style="width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.08);color:#fff;font-size:16px;display:flex;align-items:center;justify-content:center;cursor:pointer;">+</div>
+        </div>
+      </div>
+
+      <!-- 메모 -->
+      <textarea id="spMemo" placeholder="추가 요청사항을 입력해 주세요 (선택)" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:12px 16px;color:#fff;font-size:13px;font-family:'Outfit',sans-serif;resize:none;outline:none;width:100%;height:68px;margin-bottom:12px;"></textarea>
+
+      <!-- 제출 -->
+      <button id="spSubmitBtn" onclick="submitSupply()" disabled style="background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.4);border:none;border-radius:14px;padding:16px;font-size:15px;font-weight:800;font-family:'Outfit',sans-serif;cursor:default;width:100%;transition:all 0.15s;">항목을 선택해 주세요</button>
+    </div>
+
+    <!-- 완료 화면 -->
+    <div id="spSuccess" style="display:none;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:30px 0;text-align:center;">
+      <div style="font-size:54px;animation:popIn 0.4s cubic-bezier(0.32,0.72,0,1);">✅</div>
+      <div style="font-size:22px;font-weight:800;color:#00c471;">요청이 접수되었습니다</div>
+      <div style="font-size:14px;color:rgba(255,255,255,0.5);line-height:1.7;">행정지원그룹에서 확인 후<br>신속하게 지원해 드리겠습니다.<br><br>내선 <strong style="color:#fff">3692</strong></div>
+    </div>
+  </div>
+</div>
+
+<style>
+  @keyframes popIn{from{transform:scale(0)}to{transform:scale(1)}}
+  .sp-item:hover{background:rgba(255,255,255,0.08)!important;border-color:rgba(255,255,255,0.2)!important;}
+  .sp-item.selected{background:rgba(0,196,113,0.12)!important;border-color:rgba(0,196,113,0.5)!important;}
+  .sp-item.selected .sp-check{opacity:1!important;transform:scale(1)!important;}
+</style>
+
+<script>
+function pad(n){return String(n).padStart(2,'0');}
+function updateClock(){
+  const now=new Date(),h=now.getHours(),m=now.getMinutes();
+  const days=['일','월','화','수','목','금','토'];
+  document.getElementById('clockTime').textContent=pad(h)+':'+pad(m);
+  document.getElementById('clockDate').textContent=now.getFullYear()+'년 '+(now.getMonth()+1)+'월 '+now.getDate()+'일 '+days[now.getDay()]+'요일';
+}
+updateClock();
+setInterval(updateClock,10000);
+
+// QR 클릭
+document.getElementById('el-qr').style.cursor='pointer';
+document.getElementById('el-qr').addEventListener('click', openSupply);
+
+let selectedItems=new Set(), qty=1;
+
+function openSupply(){
+  selectedItems.clear(); qty=1;
+  document.getElementById('spQty').textContent='1';
+  document.getElementById('spMemo').value='';
+  document.querySelectorAll('.sp-item').forEach(el=>el.classList.remove('selected'));
+  const btn=document.getElementById('spSubmitBtn');
+  btn.disabled=true; btn.textContent='항목을 선택해 주세요';
+  btn.style.background='rgba(255,255,255,0.1)'; btn.style.color='rgba(255,255,255,0.4)'; btn.style.cursor='default';
+  document.getElementById('spForm').style.display='';
+  document.getElementById('spSuccess').style.display='none';
+  const ov=document.getElementById('supplyOverlay');
+  ov.style.opacity='1'; ov.style.pointerEvents='auto';
+  document.getElementById('supplyPanel').style.transform='scale(1) translateY(0)';
+}
+function closeSupply(){
+  const ov=document.getElementById('supplyOverlay');
+  ov.style.opacity='0'; ov.style.pointerEvents='none';
+  document.getElementById('supplyPanel').style.transform='scale(0.92) translateY(18px)';
+}
+function closeSupplyOutside(e){ if(e.target===document.getElementById('supplyOverlay')) closeSupply(); }
+
+function toggleItem(el){
+  const item=el.dataset.item;
+  if(selectedItems.has(item)){ selectedItems.delete(item); el.classList.remove('selected'); }
+  else { selectedItems.add(item); el.classList.add('selected'); }
+  const btn=document.getElementById('spSubmitBtn');
+  if(selectedItems.size>0){
+    btn.disabled=false;
+    btn.textContent=[...selectedItems].join(', ')+' 요청하기';
+    btn.style.background='#00c471'; btn.style.color='#000'; btn.style.cursor='pointer';
+  } else {
+    btn.disabled=true; btn.textContent='항목을 선택해 주세요';
+    btn.style.background='rgba(255,255,255,0.1)'; btn.style.color='rgba(255,255,255,0.4)'; btn.style.cursor='default';
+  }
+}
+function changeQty(d){ qty=Math.max(1,Math.min(20,qty+d)); document.getElementById('spQty').textContent=qty; }
+function submitSupply(){
+  document.getElementById('spForm').style.display='none';
+  document.getElementById('spSuccess').style.display='flex';
+  setTimeout(closeSupply,3500);
+}
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeSupply(); });
+</script>
+</body>
+</html>
