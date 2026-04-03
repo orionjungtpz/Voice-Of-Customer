@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280">
+<title>회의실 사이니지</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html,body{width:1280px;height:800px;overflow:hidden;font-family:'Outfit','Apple SD Gothic Neo','Malgun Gothic',sans-serif;background:#000;color:#fff;}
+  #signage{width:1280px;height:800px;position:relative;overflow:hidden;}
+  .s-bg{position:absolute;inset:0;z-index:0;background:radial-gradient(ellipse 70% 55% at 18% 105%,rgba(0,48,135,0.75) 0%,transparent 58%),radial-gradient(ellipse 55% 45% at 82% -5%,rgba(75,15,95,0.55) 0%,transparent 52%),radial-gradient(ellipse 45% 55% at 58% 85%,rgba(150,55,8,0.42) 0%,transparent 48%),linear-gradient(148deg,#160820 0%,#0b1828 45%,#180c06 100%);}
+  .el{position:absolute;cursor:default;}
+  .qr-inner{display:flex;align-items:center;gap:12px;background:rgba(16,14,30,0.85);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,0.1);border-radius:14px;padding:10px 18px 10px 12px;}
+  .qr-right{display:flex;flex-direction:column;gap:5px;}
+  .qr-badge{background:rgba(0,196,113,0.18);border:1px solid rgba(0,196,113,0.38);border-radius:20px;padding:2px 10px;font-size:10px;font-weight:700;color:#00c471;letter-spacing:1px;}
+  .qr-hint{font-size:11px;color:rgba(255,255,255,0.5);white-space:nowrap;}
+  .clock-time-txt{font-family:'DM Mono',monospace;font-size:52px;font-weight:500;line-height:1;letter-spacing:-2px;color:#fff;}
+  .clock-date-txt{font-size:13px;color:rgba(255,255,255,0.5);margin-top:6px;}
+  #el-floor{display:flex;align-items:center;gap:10px;}
+  .floor-line-el{height:2.5px;background:#00c471;border-radius:2px;width:26px;}
+  .floor-label-el{font-size:13px;font-weight:700;letter-spacing:3px;color:#00c471;text-transform:uppercase;}
+  .room-name-txt{font-size:58px;font-weight:800;line-height:1;letter-spacing:-1.5px;white-space:nowrap;color:#fff;}
+  .notice-inner{display:inline-flex;align-items:center;gap:9px;background:rgba(230,57,70,0.13);border:1px solid rgba(230,57,70,0.32);border-radius:30px;padding:8px 18px;font-size:13px;font-weight:500;color:#f87171;}
+  .notice-dot{width:7px;height:7px;border-radius:50%;background:#e63946;animation:pulse 1.8s ease-in-out infinite;flex-shrink:0;}
+  @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.35;transform:scale(0.75)}}
+  #el-amenities{display:flex;gap:22px;align-items:center;}
+  .amenity-chip{display:flex;align-items:center;gap:6px;font-size:12px;color:rgba(255,255,255,0.5);}
+  #el-contact{font-size:11px;color:rgba(255,255,255,0.28);}
+  #el-statuscard{background:rgba(16,14,26,0.88);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,0.08);border-radius:20px;padding:26px 26px 22px;overflow:hidden;}
+  #el-statuscard::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;background:#e63946;border-radius:20px 0 0 20px;}
+  .sc-glow{position:absolute;right:-30px;top:-30px;width:140px;height:140px;border-radius:50%;background:rgba(230,57,70,0.18);filter:blur(28px);}
+  .sc-eye{display:flex;align-items:center;gap:8px;margin-bottom:12px;position:relative;z-index:1;}
+  .sc-dot{width:8px;height:8px;border-radius:50%;background:#e63946;animation:pulse 1.8s ease-in-out infinite;}
+  .sc-lbl{font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#e63946;}
+  .sc-title{font-size:26px;font-weight:800;line-height:1.15;margin-bottom:8px;position:relative;z-index:1;letter-spacing:-0.5px;}
+  .sc-time{font-family:'DM Mono',monospace;font-size:13px;color:rgba(255,255,255,0.5);position:relative;z-index:1;margin-bottom:16px;}
+  .sc-meta{display:flex;gap:20px;position:relative;z-index:1;padding-top:14px;border-top:1px solid rgba(255,255,255,0.08);}
+  .sc-meta-item{display:flex;align-items:center;gap:7px;font-size:13px;color:rgba(255,255,255,0.5);}
+  #el-schedule{background:rgba(16,14,26,0.88);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:20px 22px;}
+  .sch-lbl{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.28);margin-bottom:16px;}
+  .sch-item{display:flex;align-items:stretch;gap:13px;padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.05);}
+  .sch-item:last-child{border-bottom:none;padding-bottom:0;}
+  .sch-bar{width:3px;border-radius:2px;flex-shrink:0;}
+  .sch-bar.busy{background:#e63946;}.sch-bar.upcoming{background:#4488ff;}
+  .sch-info{flex:1;}
+  .sch-title-txt{font-size:13px;font-weight:600;color:#fff;margin-bottom:4px;line-height:1.2;}
+  .sch-time-txt{font-family:'DM Mono',monospace;font-size:11px;color:rgba(255,255,255,0.5);}
+</style>
+</head>
+<body>
+<div id="signage">
+          <div class="s-bg"></div>
+
+          <!-- QR -->
+          <div class="el" id="el-qr" data-name="QR 박스" style="left: 40px; top: 37px; transform: scale(1.4); transform-origin: left top;">
+            
+            <div class="qr-inner">
+              <div class="qr-svg-wrap">
+                <svg id="qr-svg" width="46" height="46" viewBox="0 0 60 60" style="background:#fff;padding:4px;border-radius:4px;display:block;">
+                  <rect width="60" height="60" fill="white"></rect>
+                  <rect x="4" y="4" width="18" height="18" fill="black" rx="2"></rect><rect x="6" y="6" width="14" height="14" fill="white" rx="1"></rect><rect x="8" y="8" width="10" height="10" fill="black" rx="1"></rect>
+                  <rect x="38" y="4" width="18" height="18" fill="black" rx="2"></rect><rect x="40" y="6" width="14" height="14" fill="white" rx="1"></rect><rect x="42" y="8" width="10" height="10" fill="black" rx="1"></rect>
+                  <rect x="4" y="38" width="18" height="18" fill="black" rx="2"></rect><rect x="6" y="40" width="14" height="14" fill="white" rx="1"></rect><rect x="8" y="42" width="10" height="10" fill="black" rx="1"></rect>
+                  <rect x="26" y="4" width="4" height="4" fill="black"></rect><rect x="32" y="4" width="4" height="4" fill="black"></rect>
+                  <rect x="26" y="10" width="4" height="4" fill="black"></rect><rect x="32" y="14" width="4" height="4" fill="black"></rect>
+                  <rect x="26" y="26" width="4" height="4" fill="black"></rect><rect x="32" y="26" width="4" height="4" fill="black"></rect>
+                  <rect x="38" y="26" width="4" height="4" fill="black"></rect><rect x="44" y="26" width="4" height="4" fill="black"></rect>
+                  <rect x="50" y="26" width="4" height="4" fill="black"></rect><rect x="26" y="32" width="4" height="4" fill="black"></rect>
+                  <rect x="44" y="32" width="4" height="4" fill="black"></rect><rect x="26" y="38" width="4" height="4" fill="black"></rect>
+                  <rect x="32" y="38" width="4" height="4" fill="black"></rect><rect x="50" y="38" width="4" height="4" fill="black"></rect>
+                  <rect x="4" y="26" width="4" height="4" fill="black"></rect><rect x="10" y="26" width="4" height="4" fill="black"></rect>
+                  <rect x="16" y="26" width="4" height="4" fill="black"></rect><rect x="4" y="32" width="4" height="4" fill="black"></rect>
+                  <rect x="16" y="32" width="4" height="4" fill="black"></rect>
+                </svg>
+              </div>
+              <div class="qr-right">
+                <div class="qr-badge" id="qr-badge-txt">비품 요청</div>
+                <div class="qr-hint" id="qr-hint-txt">탭하여 요청하기</div>
+              </div>
+            </div>
+            
+          </div>
+
+          <!-- 시계 -->
+          <div class="el" id="el-clock" data-name="시계" style="left: 1060px; top: 22px;">
+            
+            <div class="clock-time-txt" id="clockTime" style="text-align: center; font-size: 48px;">17:02</div>
+            <div class="clock-date-txt" id="clockDate" style="font-size: 16px;">2026년 4월 3일 금요일</div>
+            
+          </div>
+
+          <!-- 층/회의실 레이블 -->
+          <div class="el" id="el-floor" data-name="층 레이블" style="left: 53px; top: 165px;">
+            
+            <div class="floor-line-el" id="floor-line"></div>
+            <div class="floor-label-el" id="floor-label-txt" style="font-size: 28px;">9F · 교육장 1</div>
+            
+          </div>
+
+          <!-- 회의 제목 -->
+          <div class="el" id="el-roomname" data-name="회의 제목" style="top: 268px; left: 49px;">
+            
+            <div class="room-name-txt" id="roomname-txt" style="font-size: 65px;">비즈니스라운지 리뉴얼 회의</div>
+            
+          </div>
+
+          <!-- 공지 -->
+          <div class="el" id="el-notice" data-name="공지 배지" style="left: 58px; top: 379px;">
+            
+            <div class="notice-inner">
+              <div class="notice-dot"></div>
+              <span id="notice-txt" style="font-size: 16px;">행정지원그룹 / 혜인에스엔에스</span>
+            </div>
+            
+          </div>
+
+          <!-- 설비 -->
+          <div class="el" id="el-amenities" data-name="설비 태그" style="left: 48px; top: 687px;">
+            
+            <div class="amenity-chip" style="font-size: 15px;">📺 <span id="am1">프로젝터</span></div>
+            <div class="amenity-chip" style="font-size: 15px;">🔊 <span id="am2">음향</span></div>
+            <div class="amenity-chip" style="font-size: 15px;">📡 <span id="am3">화상회의</span></div>
+            <div class="amenity-chip" style="font-size: 15px;">🖊️ <span id="am4">화이트보드</span></div>
+            
+          </div>
+
+          <!-- 연락처 -->
+          <div class="el" id="el-contact" data-name="연락처" style="left: 56px; top: 731px;">
+            
+            <span id="contact-txt" style="font-size: 16px;">행정지원그룹 · 내선 3692</span>
+            
+          </div>
+
+          <!-- 상태 카드 -->
+          <div class="el" id="el-statuscard" data-name="상태 카드" style="left: 863px; top: 143px; width: 400px;">
+            
+            <div class="sc-glow"></div>
+            <div class="sc-eye">
+              <div class="sc-dot"></div>
+              <div class="sc-lbl" id="sc-lbl-txt" style="font-size: 14px;">사용 중</div>
+            </div>
+            <div class="sc-title" id="sc-title-txt" style="font-size: 28px;">9층 비즈니스라운지 리뉴얼 </div>
+            <div class="sc-time" id="sc-time-txt" style="font-size: 16px;">09:00 – 10:20</div>
+            <div class="sc-meta">
+              <div class="sc-meta-item">👤 <span id="sc-org-txt">한승호</span></div>
+              <div class="sc-meta-item">👥 <span id="sc-count-txt">행정지원그룹</span></div>
+            </div>
+            
+          </div>
+
+          <!-- 일정 카드 -->
+          <div class="el" id="el-schedule" data-name="일정 목록" style="left: 851px; top: 371px;">
+            
+            <div class="sch-lbl">오늘 일정</div>
+            <div class="sch-item"><div class="sch-bar busy"></div><div class="sch-info"><div class="sch-title-txt" id="sch1-title" style="font-size: 19px;">제 26기 정기 주주총회</div><div class="sch-time-txt" id="sch1-time" style="font-size: 14px;">09:00 – 10:20 · IR담당</div></div></div>
+            <div class="sch-item"><div class="sch-bar upcoming"></div><div class="sch-info"><div class="sch-title-txt" id="sch2-title" style="font-size: 19px;">이사회 보고</div><div class="sch-time-txt" id="sch2-time" style="font-size: 14px;">11:00 – 12:30 · 경영기획팀</div></div></div>
+            <div class="sch-item"><div class="sch-bar upcoming"></div><div class="sch-info"><div class="sch-title-txt" id="sch3-title" style="font-size: 19px;">임원 간담회</div><div class="sch-time-txt" id="sch3-time" style="font-size: 14px;">14:00 – 15:00 · 대표이사실</div></div></div>
+            
+          </div>
+
+        </div>
+<script>
+function pad(n){return String(n).padStart(2,'0');}
+function updateClock(){
+  const now=new Date(),h=now.getHours(),m=now.getMinutes();
+  const days=['일','월','화','수','목','금','토'];
+  document.getElementById('clockTime').textContent=pad(h)+':'+pad(m);
+  document.getElementById('clockDate').textContent=now.getFullYear()+'년 '+(now.getMonth()+1)+'월 '+now.getDate()+'일 '+days[now.getDay()]+'요일';
+}
+updateClock();setInterval(updateClock,10000);
+</script>
+</body>
+</html>
