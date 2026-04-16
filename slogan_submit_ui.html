@@ -216,7 +216,7 @@
 
   <div class="hero">
     <div class="badge">POSCO INTERNATIONAL · 2026</div>
-    <div class="hero-title">안전슬로건 공모전</div>
+    <div class="hero-title">안전 슬로건<br>공모전</div>
     <p class="hero-sub">포스코인터내셔널 행정지원그룹</p>
   </div>
 
@@ -233,7 +233,7 @@
         <div class="p-label">최우수</div>
         <div class="p-val">1명</div>
       </div>
-     </div>
+    </div>
 
     <div class="form-view" id="formView">
 
@@ -279,7 +279,7 @@
 
 <script>
 // ⬇️ Power Automate HTTP 트리거 URL을 여기에 붙여넣기
-const FLOW_URL = "https://defaultb9501effd05e4bf18a87898d83f46c.eb.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/5dbd80e80a674fa0967c2b8e7f63a05c/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=QGTGN9sVhGFwasU0s9xbqDTVJmnSF1dniwJEP3OpK7c";
+const FLOW_URL = "https://defaultb9501effd05e4bf18a87898d83f46c.eb.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/c8e50c55a0864e1b987c5c7738104463/triggers/manual/paths/invoke?api-version=1";
 
 function updateCount() {
   const t = document.getElementById('content');
@@ -315,9 +315,9 @@ async function handleSubmit() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         접수자: name,
-        부서: dept,
-        내용: content,
-        접수일자: new Date().toISOString()
+        소속: dept,
+        슬로건: content,
+        접수일자: new Date().toISOString().slice(0, 19) + 'Z'
       })
     });
   } catch (e) {
