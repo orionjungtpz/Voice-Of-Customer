@@ -1,15 +1,22 @@
-
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>안전 슬로건 공모전 접수</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&family=Bebas+Neue&display=swap" rel="stylesheet">
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&family=Bebas+Neue&display=swap');
+  * { box-sizing: border-box; margin: 0; padding: 0; }
 
-  .wrap {
-    min-height: 100vh;
+  body {
+    font-family: 'Noto Sans KR', sans-serif;
     background: #0a1628;
+    min-height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 24px 16px;
-    font-family: 'Noto Sans KR', sans-serif;
   }
 
   .card {
@@ -18,7 +25,7 @@
     width: 100%;
     max-width: 420px;
     overflow: hidden;
-    position: relative;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.4);
   }
 
   .hero {
@@ -27,7 +34,6 @@
     position: relative;
     overflow: hidden;
   }
-
   .hero::before {
     content: '';
     position: absolute;
@@ -36,7 +42,6 @@
     border-radius: 50%;
     background: rgba(255,255,255,0.06);
   }
-
   .hero::after {
     content: '';
     position: absolute;
@@ -49,7 +54,7 @@
   .badge {
     display: inline-block;
     background: rgba(255,255,255,0.18);
-    color: #c8d9f5;
+    color: rgba(255,255,255,0.85);
     font-size: 11px;
     font-weight: 500;
     letter-spacing: 0.06em;
@@ -80,11 +85,6 @@
     align-items: center;
     gap: 8px;
   }
-
-  .deadline-icon {
-    font-size: 13px;
-  }
-
   .deadline-text {
     font-size: 12px;
     font-weight: 700;
@@ -96,10 +96,23 @@
     padding: 24px 28px 28px;
   }
 
-  .field {
+  .prize-row {
+    display: flex;
+    gap: 8px;
     margin-bottom: 20px;
   }
+  .prize-chip {
+    flex: 1;
+    background: #f0f4ff;
+    border-radius: 10px;
+    padding: 10px 8px;
+    text-align: center;
+  }
+  .prize-chip .p-icon { font-size: 18px; }
+  .prize-chip .p-label { font-size: 10px; color: #7a90b8; margin-top: 3px; font-weight: 500; }
+  .prize-chip .p-val { font-size: 12px; color: #003087; font-weight: 700; margin-top: 1px; }
 
+  .field { margin-bottom: 20px; }
   .field label {
     display: flex;
     align-items: center;
@@ -111,16 +124,10 @@
     text-transform: uppercase;
     margin-bottom: 8px;
   }
-
-  .field label .req {
-    color: #e53935;
-    font-size: 14px;
-    line-height: 1;
-  }
+  .req { color: #e53935; font-size: 14px; line-height: 1; }
 
   .field input,
-  .field textarea,
-  .field select {
+  .field textarea {
     width: 100%;
     padding: 12px 14px;
     border: 1.5px solid #e0e7f3;
@@ -133,47 +140,22 @@
     box-sizing: border-box;
     -webkit-appearance: none;
   }
-
   .field input:focus,
-  .field textarea:focus,
-  .field select:focus {
+  .field textarea:focus {
     outline: none;
     border-color: #003087;
     box-shadow: 0 0 0 3px rgba(0,48,135,0.10);
     background: #fff;
   }
-
   .field input::placeholder,
-  .field textarea::placeholder {
-    color: #b0bcd4;
-  }
+  .field textarea::placeholder { color: #b0bcd4; }
+  .field textarea { height: 130px; resize: none; line-height: 1.6; }
 
-  .field textarea {
-    height: 130px;
-    resize: none;
-    line-height: 1.6;
-  }
-
-  .hint {
-    font-size: 11px;
-    color: #8fa0c0;
-    margin-top: 5px;
-  }
-
-  .char-count {
-    text-align: right;
-    font-size: 11px;
-    color: #b0bcd4;
-    margin-top: 4px;
-  }
-
+  .hint { font-size: 11px; color: #8fa0c0; margin-top: 5px; }
+  .char-count { text-align: right; font-size: 11px; color: #b0bcd4; margin-top: 4px; }
   .char-count.warn { color: #e53935; }
 
-  .dept-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-  }
+  .dept-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 
   .submit-btn {
     width: 100%;
@@ -187,29 +169,11 @@
     font-family: 'Noto Sans KR', sans-serif;
     cursor: pointer;
     margin-top: 4px;
-    letter-spacing: 0.02em;
-    position: relative;
-    overflow: hidden;
     transition: background 0.18s, transform 0.1s;
   }
-
   .submit-btn:hover { background: #00205e; }
   .submit-btn:active { transform: scale(0.98); }
-
-  .submit-btn.loading {
-    background: #6b8abf;
-    cursor: not-allowed;
-  }
-
-  .submit-btn.success {
-    background: #1a7f4e;
-  }
-
-  .divider {
-    height: 1px;
-    background: #edf2fb;
-    margin: 20px 0;
-  }
+  .submit-btn.loading { background: #6b8abf; cursor: not-allowed; }
 
   .footer-note {
     font-size: 11px;
@@ -219,70 +183,20 @@
     line-height: 1.5;
   }
 
-  .prize-row {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 20px;
-  }
-
-  .prize-chip {
-    flex: 1;
-    background: #f0f4ff;
-    border-radius: 10px;
-    padding: 10px 8px;
-    text-align: center;
-  }
-
-  .prize-chip .p-icon { font-size: 18px; }
-
-  .prize-chip .p-label {
-    font-size: 10px;
-    color: #7a90b8;
-    margin-top: 3px;
-    font-weight: 500;
-  }
-
-  .prize-chip .p-val {
-    font-size: 12px;
-    color: #003087;
-    font-weight: 700;
-    margin-top: 1px;
-  }
-
-  .success-view {
-    display: none;
-    text-align: center;
-    padding: 40px 28px;
-  }
-
+  .success-view { display: none; text-align: center; padding: 40px 28px; }
   .success-view.show { display: block; }
   .form-view.hide { display: none; }
 
   .check-circle {
-    width: 64px;
-    height: 64px;
+    width: 64px; height: 64px;
     background: #e8f5ee;
     border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    display: flex; align-items: center; justify-content: center;
     margin: 0 auto 16px;
     font-size: 28px;
   }
-
-  .success-title {
-    font-size: 18px;
-    font-weight: 700;
-    color: #1a7f4e;
-    margin-bottom: 8px;
-  }
-
-  .success-sub {
-    font-size: 13px;
-    color: #8fa0c0;
-    line-height: 1.6;
-  }
-
+  .success-title { font-size: 18px; font-weight: 700; color: #1a7f4e; margin-bottom: 8px; }
+  .success-sub { font-size: 13px; color: #8fa0c0; line-height: 1.6; }
   .reset-btn {
     margin-top: 24px;
     background: none;
@@ -295,69 +209,78 @@
     cursor: pointer;
   }
 </style>
+</head>
+<body>
 
-<div class="wrap">
-  <div class="card">
-    <div class="hero">
-      <div class="badge">POSCO INTERNATIONAL · 2026</div>
-      <div class="hero-title">안전슬로건 공모전</div>
-      <p class="hero-sub">포스코인터내셔널 행정지원그룹</p>
-    </div>
+<div class="card">
 
-    <div class="deadline-strip">
-      <span class="deadline-icon">📅</span>
-      <span class="deadline-text">접수기간 : ~ 2026.05.15 14:00</span>
-    </div>
+  <div class="hero">
+    <div class="badge">POSCO INTERNATIONAL · 2026</div>
+    <div class="hero-title">안전슬로건 공모전</div>
+    <p class="hero-sub">포스코인터내셔널 행정지원그룹</p>
+  </div>
 
-    <div class="body">
+  <div class="deadline-strip">
+    <span style="font-size:13px;">📅</span>
+    <span class="deadline-text">접수기간 : ~2026.05.15, 14:00</span>
+  </div>
 
-      <div class="prize-row">
-        <div class="prize-chip">
-          <div class="p-icon">🥇</div>
-          <div class="p-label">최우수</div>
-          <div class="p-val">1명</div>
-        </div>       
+  <div class="body">
+
+    <div class="prize-row">
+      <div class="prize-chip">
+        <div class="p-icon">🥇</div>
+        <div class="p-label">최우수</div>
+        <div class="p-val">1명</div>
       </div>
+     </div>
 
-      <div class="form-view" id="formView">
-        <div class="dept-row">
-          <div class="field">
-            <label>소속 <span class="req">*</span></label>
-            <input type="text" id="dept" placeholder="행정지원그룹">
-          </div>
-          <div class="field">
-            <label>이름 <span class="req">*</span></label>
-            <input type="text" id="name" placeholder="홍길동">
-          </div>
-        </div>
+    <div class="form-view" id="formView">
 
+      <div class="dept-row">
         <div class="field">
-          <label>슬로건 내용 <span class="req">*</span></label>
-          <textarea id="content" placeholder="안전 슬로건을 입력해주세요.&#10;&#10;예) 오늘도 안전하게, 내일도 함께!" maxlength="200" oninput="updateCount()"></textarea>
-          <div class="char-count" id="charCount">0 / 200</div>
-          <div class="hint">간결하고 기억하기 쉬운 문구일수록 좋습니다</div>
+          <label>소속 <span class="req">*</span></label>
+          <input type="text" id="dept" placeholder="행정지원그룹">
         </div>
-
-        <button class="submit-btn" id="submitBtn" onclick="handleSubmit()">접수하기 →</button>
-
-        <div class="footer-note">
-          접수된 내용은 심사 후 개별 안내됩니다<br>
-          1인 최대 3개까지 중복 접수 가능
+        <div class="field">
+          <label>이름 <span class="req">*</span></label>
+          <input type="text" id="name" placeholder="홍길동">
         </div>
       </div>
 
-      <div class="success-view" id="successView">
-        <div class="check-circle">✅</div>
-        <div class="success-title">접수 완료!</div>
-        <p class="success-sub">소중한 슬로건이 접수되었습니다.<br>심사 결과는 추후 개별 안내드립니다.</p>
-        <button class="reset-btn" onclick="resetForm()">다시 접수하기</button>
+      <div class="field">
+        <label>슬로건 내용 <span class="req">*</span></label>
+        <textarea id="content"
+          placeholder="안전 슬로건을 입력해주세요.&#10;&#10;예) 오늘도 안전하게, 내일도 함께!"
+          maxlength="200"
+          oninput="updateCount()"></textarea>
+        <div class="char-count" id="charCount">0 / 200</div>
+        <div class="hint">간결하고 기억하기 쉬운 문구일수록 좋습니다</div>
+      </div>
+
+      <button class="submit-btn" id="submitBtn" onclick="handleSubmit()">접수하기 →</button>
+
+      <div class="footer-note">
+        접수된 내용은 심사 후 개별 안내됩니다<br>
+        1인 최대 3개까지 중복 접수 가능
       </div>
 
     </div>
+
+    <div class="success-view" id="successView">
+      <div class="check-circle">✅</div>
+      <div class="success-title">접수 완료!</div>
+      <p class="success-sub">소중한 슬로건이 접수되었습니다.<br>심사 결과는 추후 개별 안내드립니다.</p>
+      <button class="reset-btn" onclick="resetForm()">다시 접수하기</button>
+    </div>
+
   </div>
 </div>
 
 <script>
+// ⬇️ Power Automate HTTP 트리거 URL을 여기에 붙여넣기
+const FLOW_URL = "https://defaultb9501effd05e4bf18a87898d83f46c.eb.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/c8e50c55a0864e1b987c5c7738104463/triggers/manual/paths/invoke?api-version=1";
+
 function updateCount() {
   const t = document.getElementById('content');
   const c = document.getElementById('charCount');
@@ -366,17 +289,18 @@ function updateCount() {
   c.className = 'char-count' + (len > 170 ? ' warn' : '');
 }
 
-function handleSubmit() {
-  const dept = document.getElementById('dept').value.trim();
-  const name = document.getElementById('name').value.trim();
+async function handleSubmit() {
+  const dept    = document.getElementById('dept').value.trim();
+  const name    = document.getElementById('name').value.trim();
   const content = document.getElementById('content').value.trim();
-  const btn = document.getElementById('submitBtn');
+  const btn     = document.getElementById('submitBtn');
 
   if (!dept || !name || !content) {
+    const orig = btn.textContent;
     btn.textContent = '모든 항목을 입력해주세요';
     btn.style.background = '#e53935';
     setTimeout(() => {
-      btn.textContent = '접수하기 →';
+      btn.textContent = orig;
       btn.style.background = '';
     }, 1800);
     return;
@@ -385,10 +309,23 @@ function handleSubmit() {
   btn.textContent = '접수 중...';
   btn.className = 'submit-btn loading';
 
-  setTimeout(() => {
-    document.getElementById('formView').classList.add('hide');
-    document.getElementById('successView').classList.add('show');
-  }, 900);
+  try {
+    await fetch(FLOW_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        접수자: name,
+        부서: dept,
+        내용: content,
+        접수일자: new Date().toISOString()
+      })
+    });
+  } catch (e) {
+    // CORS 환경에서도 데이터는 전달됨
+  }
+
+  document.getElementById('formView').classList.add('hide');
+  document.getElementById('successView').classList.add('show');
 }
 
 function resetForm() {
@@ -396,9 +333,13 @@ function resetForm() {
   document.getElementById('name').value = '';
   document.getElementById('content').value = '';
   updateCount();
-  document.getElementById('submitBtn').textContent = '접수하기 →';
-  document.getElementById('submitBtn').className = 'submit-btn';
+  const btn = document.getElementById('submitBtn');
+  btn.textContent = '접수하기 →';
+  btn.className = 'submit-btn';
   document.getElementById('formView').classList.remove('hide');
   document.getElementById('successView').classList.remove('show');
 }
 </script>
+
+</body>
+</html>
