@@ -1102,15 +1102,82 @@ function doSubmit() {
     return ['chair','light','roll','marker','tissue','wet'].some(function(k){return r[k]==='미체크';});
   });
 
-  var NL='\r\n';
-  var body='건물: '+cBldg+NL+'구역: '+cZone+NL+'점검자: '+cIns+NL+'일시: '+dt+NL
-          +'결과: '+(bad.length?'⚠️ 점검필요':'✅ 양호');
-  if(bad.length) body+=NL+NL+'[미체크]'+NL+bad.map(function(r){
-    var NAMES={chair:'의자',light:'전등',roll:'롤스크린',marker:'보드마카',tissue:'휴지',wet:'물티슈'};
-    return '• '+r.room+': '+['chair','light','roll','marker','tissue','wet']
-      .filter(function(k){return r[k]==='미체크';})
-      .map(function(k){return NAMES[k];}).join(', ');
-  }).join(NL);
+  var NAMES={chair:'의자',light:'전등',roll:'롤스크린',marker:'보드마카',tissue:'휴지',wet:'물티슈'};
+  var KEYS=['chair','light','roll','marker','tissue','wet'];
+  var statusColor=bad.length?'#ef4444':'#22c55e';
+  var statusText=bad.length?'⚠️ 점검필요':'✅ 양호';
+
+  // HTML 이메일 본문
+  var body='<div style="font-family:Arial,sans-serif;max-width:700px;margin:0 auto;">'
+    +'<div style="background:#003087;padding:20px 24px;border-radius:8px 8px 0 0;">'
+    +'<h2 style="color:#fff;margin:0;font-size:18px;">📋 비즈니스라운지 일일점검 결과</h2>'
+    +'</div>'
+    +'<div style="background:#f8faff;padding:20px 24px;border:1px solid #dde5f4;border-top:none;">'
+    +'<table style="width:100%;border-collapse:collapse;margin-bottom:16px;">'
+    +'<tr><td style="padding:6px 12px;font-weight:bold;color:#6b7280;width:80px;">건물</td>'
+    +'<td style="padding:6px 12px;color:#1a2340;">'+cBldg+'</td></tr>'
+    +'<tr style="background:#fff;"><td style="padding:6px 12px;font-weight:bold;color:#6b7280;">구역</td>'
+    +'<td style="padding:6px 12px;color:#1a2340;">'+cZone+'</td></tr>'
+    +'<tr><td style="padding:6px 12px;font-weight:bold;color:#6b7280;">점검자</td>'
+    +'<td style="padding:6px 12px;color:#1a2340;">'+cIns+'</td></tr>'
+    +'<tr style="background:#fff;"><td style="padding:6px 12px;font-weight:bold;color:#6b7280;">일시</td>'
+    +'<td style="padding:6px 12px;color:#1a2340;">'+dt+'</td></tr>'
+    +'<tr><td style="padding:6px 12px;font-weight:bold;color:#6b7280;">결과</td>'
+    +'<td style="padding:6px 12px;font-weight:bold;color:'+statusColor+';">'+statusText+'</td></tr>'
+    +'</table>'
+
+    // 전체 점검 결과 표
+    +'<h3 style="color:#003087;font-size:14px;margin:20px 0 8px;">전체 점검 결과</h3>'
+    +'<table style="width:100%;border-collapse:collapse;font-size:13px;">'
+    +'<thead>'
+    +'<tr style="background:#003087;color:#fff;">'
+    +'<th style="padding:8px;text-align:left;border:1px solid #dde5f4;">공간</th>'
+    +'<th style="padding:8px;text-align:center;border:1px solid #dde5f4;">의자</th>'
+    +'<th style="padding:8px;text-align:center;border:1px solid #dde5f4;">전등</th>'
+    +'<th style="padding:8px;text-align:center;border:1px solid #dde5f4;">롤스크린</th>'
+    +'<th style="padding:8px;text-align:center;border:1px solid #dde5f4;">보드마카</th>'
+    +'<th style="padding:8px;text-align:center;border:1px solid #dde5f4;">휴지</th>'
+    +'<th style="padding:8px;text-align:center;border:1px solid #dde5f4;">물티슈</th>'
+    +'<th style="padding:8px;text-align:left;border:1px solid #dde5f4;">비고</th>'
+    +'</tr>'
+    +'</thead><tbody>'
+    +details.map(function(r,i){
+      var bg=i%2===0?'#fff':'#f8faff';
+      var rowBad=KEYS.some(function(k){return r[k]==='미체크';});
+      if(rowBad) bg='#fff5f5';
+      return '<tr style="background:'+bg+';">'
+        +'<td style="padding:7px 8px;border:1px solid #dde5f4;font-weight:'+(rowBad?'bold':'normal')+';color:'+(rowBad?'#ef4444':'#1a2340')+';">'+r.room+'</td>'
+        +KEYS.map(function(k){
+          var ok=r[k]==='✓';
+          return '<td style="padding:7px 8px;text-align:center;border:1px solid #dde5f4;color:'+(ok?'#22c55e':'#ef4444')+';font-weight:bold;">'+(ok?'✓':'✗')+'</td>';
+        }).join('')
+        +'<td style="padding:7px 8px;border:1px solid #dde5f4;color:#6b7280;font-size:12px;">'+(r.note||'-')+'</td>'
+        +'</tr>';
+    }).join('')
+    +'</tbody></table>'
+
+    // 미체크 항목 요약
+    +(bad.length
+      ?'<h3 style="color:#ef4444;font-size:14px;margin:20px 0 8px;">⚠️ 미체크 항목</h3>'
+       +'<table style="width:100%;border-collapse:collapse;font-size:13px;">'
+       +'<thead><tr style="background:#fef2f2;">'
+       +'<th style="padding:8px;text-align:left;border:1px solid #fecaca;color:#ef4444;">공간</th>'
+       +'<th style="padding:8px;text-align:left;border:1px solid #fecaca;color:#ef4444;">미체크 항목</th>'
+       +'</tr></thead><tbody>'
+       +bad.map(function(r){
+         return '<tr><td style="padding:7px 8px;border:1px solid #fecaca;font-weight:bold;">'+r.room+'</td>'
+           +'<td style="padding:7px 8px;border:1px solid #fecaca;color:#ef4444;">'
+           +KEYS.filter(function(k){return r[k]==='미체크';}).map(function(k){return NAMES[k];}).join(', ')
+           +'</td></tr>';
+       }).join('')
+       +'</tbody></table>'
+      :'')
+
+    +'</div>'
+    +'<div style="background:#f0f4fb;padding:12px 24px;border:1px solid #dde5f4;border-top:none;border-radius:0 0 8px 8px;text-align:center;">'
+    +'<span style="font-size:11px;color:#6b7280;">포스코인터내셔널 시설관리시스템 | 행정지원그룹</span>'
+    +'</div>'
+    +'</div>';
 
   var payload={
     summaryId:   summaryId,
