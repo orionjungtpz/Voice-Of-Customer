@@ -1094,7 +1094,7 @@ function doSubmit() {
       tissue:    state[room]['tissue'] ?'✓':'미체크',
       wet:       state[room]['wet']    ?'✓':'미체크',
       note:      note?note.value:'',
-      photoUrls: photos.join(',')
+      photoUrls: photos.length ? photos[0] : ''
     });
   });
 
