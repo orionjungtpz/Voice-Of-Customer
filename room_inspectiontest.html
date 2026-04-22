@@ -75,7 +75,7 @@ body{font-family:'Pretendard','Apple SD Gothic Neo',sans-serif;background:var(--
 .p2hdr{background:#f8faff;border-bottom:1px solid var(--bd);padding:8px 14px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
 .pill{font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;color:#fff;white-space:nowrap;}
 .dp{font-size:10px;color:var(--mu);margin-left:auto;}
-.twrap{overflow:auto;max-height:calc(100vh - 150px);flex:1;width:100%;}
+.twrap{overflow:auto;flex:1;width:100%;margin-bottom:60px;}
 table{width:100%;border-collapse:collapse;font-size:11px;table-layout:fixed;}
 thead th{background:var(--p);color:#fff;padding:6px 2px;text-align:center;position:sticky;top:0;z-index:30;font-size:10px;white-space:nowrap;}
 thead th:first-child{text-align:left;width:58px;position:sticky;left:0;z-index:40;}
@@ -95,7 +95,7 @@ tbody td:nth-child(n+4):not(:last-child){width:26px;}
 .chk.on{background:var(--p);border-color:var(--p);color:#fff;}
 .ni{width:100%;border:1.5px solid var(--bd);border-radius:5px;padding:3px 4px;font-size:10px;font-family:inherit;background:#fff;}
 .ni.warn{border-color:#ef4444;background:#fff0f0;}
-.p2ft{padding:8px 14px;border-top:1px solid var(--bd);display:flex;gap:8px;}
+.p2ft{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:700px;padding:8px 14px calc(8px + env(safe-area-inset-bottom));border-top:1px solid var(--bd);display:flex;gap:8px;background:#fff;z-index:50;}
 .p2ft button{flex:1;padding:9px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;}
 .wip{display:none;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;gap:16px;text-align:center;padding:40px;}
 .wip h2{font-size:20px;font-weight:700;}
@@ -1026,6 +1026,11 @@ function tAll(room,rid,el) {
 }
 function addPhoto(rid,input) {
   if(!input.files[0]) return;
+  if(photoStore[rid]&&photoStore[rid].length>=1) {
+    alert('사진은 1장만 첨부할 수 있습니다.\n기존 사진을 삭제 후 다시 첨부해주세요.');
+    input.value='';
+    return;
+  }
   compressImg(input.files[0],600,0.7,function(src) {
     if(!photoStore[rid]) photoStore[rid]=[];
     var idx=photoStore[rid].length;
