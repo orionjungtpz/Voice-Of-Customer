@@ -318,13 +318,37 @@ const ORG = {
 
 const ZONE_CONFIG = {
   '비즈니스라운지': {
-    items:['chair','light','roll','marker','tissue','wet'],
-    itemNames:['의자','전등','롤스크린','보드마카','휴지','물티슈'],
-    seatMap:{'접견실':8,'BIZ 1':12,'BIZ 2':12,'BIZ 3':8,'BIZ 4':8,'BIZ 5':8,'BIZ 6':8,'BIZ 7':10,'BIZ 8':8,'BIZ 9':8,'BIZ 10':8,'BIZ 11':5,'BIZ 12':5,'BIZ 13':10,'BIZ 14':5,'BIZ 15':8,'BIZ 16':8,'BIZ 17':10,'BIZ 18':8,'TRAINING 1':16,'TRAINING 2':16,'TRAINING 3':16},
-    rooms:[
-      {group:'접견실',list:['접견실']},
-      {group:'BIZ ROOM',list:['BIZ 1','BIZ 2','BIZ 3','BIZ 4','BIZ 5','BIZ 6','BIZ 7','BIZ 8','BIZ 9','BIZ 10','BIZ 11','BIZ 12','BIZ 13','BIZ 14','BIZ 15','BIZ 16','BIZ 17','BIZ 18']},
-      {group:'TRAINING ROOM',list:['TRAINING 1','TRAINING 2','TRAINING 3']}
+    items: ['chair','light','roll','marker','tissue','wet'],
+    itemNames: ['의자','전등','롤스크린','보드마카','휴지','물티슈'],
+    seatMap: {'접견실':8,'BIZ 1':12,'BIZ 2':12,'BIZ 3':8,'BIZ 4':8,'BIZ 5':8,'BIZ 6':8,'BIZ 7':10,'BIZ 8':8,'BIZ 9':8,'BIZ 10':8,'BIZ 11':5,'BIZ 12':5,'BIZ 13':10,'BIZ 14':5,'BIZ 15':8,'BIZ 16':8,'BIZ 17':10,'BIZ 18':8,'TRAINING 1':16,'TRAINING 2':16,'TRAINING 3':16},
+    rooms: [
+      {group:'접견실', list:['접견실']},
+      {group:'BIZ ROOM', list:['BIZ 1','BIZ 2','BIZ 3','BIZ 4','BIZ 5','BIZ 6','BIZ 7','BIZ 8','BIZ 9','BIZ 10','BIZ 11','BIZ 12','BIZ 13','BIZ 14','BIZ 15','BIZ 16','BIZ 17','BIZ 18']},
+      {group:'TRAINING ROOM', list:['TRAINING 1','TRAINING 2','TRAINING 3']}
+    ]
+  },
+
+  'SWC송도': {
+    items: ['chair','meetingChair','tissue','coffeeMachine','paperCup','clock'],
+    itemNames: ['의자','회의의자','각티슈','커피머신','종이컵','시계'],
+    // 방마다 체크 항목이 다르므로 roomItems로 구분
+    roomItems: {
+      '임원실 1': ['chair','meetingChair','tissue'],
+      '임원실 2': ['chair','meetingChair','tissue'],
+      '임원실 3': ['chair','meetingChair','tissue'],
+      '임원실 4': ['chair','meetingChair','tissue'],
+      '임원실 5': ['chair','meetingChair','tissue'],
+      '임원실 6': ['chair','meetingChair','tissue'],
+      '탕비실':   ['coffeeMachine','paperCup','clock']
+    },
+    seatMap: {
+      '임원실 1':0,'임원실 2':0,'임원실 3':0,
+      '임원실 4':0,'임원실 5':0,'임원실 6':0,
+      '탕비실':0
+    },
+    rooms: [
+      {group:'임원실', list:['임원실 1','임원실 2','임원실 3','임원실 4','임원실 5','임원실 6']},
+      {group:'탕비실', list:['탕비실']}
     ]
   }
 };
