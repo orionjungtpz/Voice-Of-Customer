@@ -329,26 +329,23 @@ const ZONE_CONFIG = {
   },
 
   'SWC송도': {
-    items: ['chair','meetingChair','tissue','coffeeMachine','paperCup','clock'],
-    itemNames: ['의자','회의의자','각티슈','커피머신','종이컵','시계'],
+    items: ['chair','meetingChair','tissue','etc'],
+    itemNames: ['의자','회의의자','각티슈','기타'],
     // 방마다 체크 항목이 다르므로 roomItems로 구분
     roomItems: {
-      '임원실 1': ['chair','meetingChair','tissue'],
-      '임원실 2': ['chair','meetingChair','tissue'],
-      '임원실 3': ['chair','meetingChair','tissue'],
-      '임원실 4': ['chair','meetingChair','tissue'],
-      '임원실 5': ['chair','meetingChair','tissue'],
-      '임원실 6': ['chair','meetingChair','tissue'],
-      '탕비실':   ['coffeeMachine','paperCup','clock']
+      '임원실 1': ['chair','meetingChair','tissue','etc'],
+      '임원실 2': ['chair','meetingChair','tissue','etc'],
+      '임원실 3': ['chair','meetingChair','tissue','etc'],
+      '임원실 4': ['chair','meetingChair','tissue','etc'],
+      '임원실 5': ['chair','meetingChair','tissue','etc'],
+      '임원실 6': ['chair','meetingChair','tissue','etc'],
     },
     seatMap: {
-      '임원실 1':0,'임원실 2':0,'임원실 3':0,
-      '임원실 4':0,'임원실 5':0,'임원실 6':0,
-      '탕비실':0
+      '임원실 1':7,'임원실 2':7,'임원실 3':7,
+      '임원실 4':7,'임원실 5':7,'임원실 6':7,
     },
     rooms: [
       {group:'임원실', list:['임원실 1','임원실 2','임원실 3','임원실 4','임원실 5','임원실 6']},
-      {group:'탕비실', list:['탕비실']}
     ]
   }
 };
