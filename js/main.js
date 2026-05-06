@@ -359,18 +359,18 @@ function doSubmit() {
 console.log('📦 payload:', JSON.parse(payloadStr)); // ← 추가
 
 fetch(PA_URL, {
-  method: 'POST',
+  method:  'POST',
   headers: { 'Content-Type': 'application/json' },
-  body: payloadStr
+  body:    payloadStr
 })
 .then(function(r) {
-  console.log('📬 PA 응답 status:', r.status); // ← 추가
+  console.log('📬 PA 응답 status:', r.status);
   return r.text();
 })
 .then(function(t) {
-  console.log('📬 PA 응답 body:', t); // ← 추가
+  console.log('📬 PA 응답 body:', t);  // ← 이 줄 결과 확인
 })
-.catch(function(e) { console.warn(e); });
+.catch(function(e) { console.warn('❌ fetch 오류:', e); });
 }
   
 function resetApp() {
