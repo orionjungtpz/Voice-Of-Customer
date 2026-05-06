@@ -247,4 +247,148 @@ function buildEmailBadSummary(bad, KEYS, NAMES) {
 
 function buildEmailFooter() {
   return '</div>'
-    + '<div style="background:#f0f4fb;padding:12px 24px;border
+    + '<div style="background:#f0f4fb;padding:12px 24px;border:1px solid #dde5f4;'
+    + 'border-top:none;border-radius:0 0 8px 8px;text-align:center;">'
+    + '<span style="font-size:11px;color:#6b7280;">포스코인터내셔널 시설관리시스템 | 행정지원그룹</span>'
+    + '</div></div>';
+}
+
+// ── details 생성 (Key-Value) ──
+function buildDetails(roomList) {
+  var rows = [];
+  roomList.forEach(function(room) {
+    var rid    = room.replace(/ /g, '-');
+    var note   = document.getElementById('note-' + rid);
+    var photos = photoStore[rid] || [];
+    curItems.forEach(function(it, i) {
+      rows.push({
+        summaryId:  '',
+        room:       room,
+        seat:       String(curSeatMap[room] || '-'),
+        itemKey:    it,
+        itemName:   curItemNames[i],
+        checked:    state[room][it] ? '✓' : '미체크',
+        note:       note ? note.value : '',
+        photoUrls:  photos.length ? photos[0] : ''
+      });
+    });
+  });
+  return rows;
+}
+
+// ── 제출 ──
+function doSubmit() {
+  var roomList = curRooms.flatMap(function(g) { return g.list; });
+
+  // 유효성 검사
+  var warns = [];
+  roomList.forEach(function(room) {
+    var rid = room.replace(/ /g, '-');
+    var ni  = document.getElementById('note-' + rid);
+    if (ni) ni.classList.remove('warn');
+    var hasUn = curItems.some(function(it) { return !state[room][it]; });
+    if (hasUn && !(ni && ni.value.trim())) warns.push(room);
+  });
+  if (warns.length) {
+    warns.forEach(function(room) {
+      var el = document.getElementById('note-' + room.replace(/ /g, '-'));
+      if (el) el.classList.add('warn');
+    });
+    document.getElementById('warn-list').innerHTML = warns.map(function(r) {
+      return '<div class="mir"><span>' + r + '</span><span style="color:#ef4444;">조치사항 필요</span></div>';
+    }).join('');
+    document.getElementById('ov-warn').classList.add('show');
+    return;
+  }
+
+  var dt  = new Date().toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' });
+  var now = new Date();
+  var pad = function(n) { return String(n).padStart(2, '0'); };
+  var summaryId = now.getFullYear() + pad(now.getMonth() + 1) + pad(now.getDate())
+    + '-' + pad(now.getHours()) + pad(now.getMinutes()) + pad(now.getSeconds())
+    + '-' + cBldg.replace(/[^a-zA-Z0-9가-힣]/g, '');
+
+  // 동적 KEYS/NAMES
+  var KEYS  = curItems;
+  var NAMES = {};
+  curItems.forEach(function(it, i) { NAMES[it] = curItemNames[i]; });
+
+  var details     = buildDetails(roomList);
+  var bad         = details.filter(function(r) {
+    return KEYS.some(function(k) { return r[k] === '미체크'; });
+  });
+  var statusColor = bad.length ? '#ef4444' : '#22c55e';
+  var statusText  = bad.length ? '⚠️ 점검필요' : '✅ 양호';
+
+  // 이메일 본문에서 bad 중복 제거 (room 기준)
+  var badByRoom = [];
+  var seen = {};
+  details.forEach(function(r) {
+    if (r.checked === '미체크' && !seen[r.room]) {
+      seen[r.room] = true;
+      badByRoom.push(r);
+    }
+  });
+
+  var body = buildEmailHeader(dt, statusColor, statusText)
+    + buildEmailTable(details, KEYS, NAMES)
+    + buildEmailBadSummary(badByRoom, KEYS, NAMES)
+    + buildEmailFooter();
+
+  var payload = {
+    summaryId:    summaryId,
+    inspector:    cIns,
+    building:     cBldg,
+    zone:         cZone,
+    submittedAt:  dt,
+    statusTag:    bad.length ? '점검필요' : '양호',
+    emailBody:    body,
+    managerEmail: MANAGER_EMAIL,
+    details:      details
+  };
+
+  document.getElementById('done-info').innerHTML =
+    '<div class="mir"><span>건물</span><span>' + cBldg + '</span></div>'
+    + '<div class="mir"><span>구역</span><span>' + cZone + '</span></div>'
+    + '<div class="mir"><span>점검자</span><span>' + cIns + '</span></div>'
+    + '<div class="mir"><span>결과</span><span style="color:' + (bad.length ? '#ef4444' : '#22c55e') + '">'
+    + (bad.length ? '⚠️ 점검필요' : '✅ 양호') + '</span></div>';
+  document.getElementById('ov-done').classList.add('show');
+
+  fetch(PA_URL, {
+    method:  'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body:    JSON.stringify(payload)
+  }).catch(function(e) { console.warn(e); });
+}
+
+function resetApp() {
+  document.getElementById('ov-done').classList.remove('show');
+  document.getElementById('page2').style.display = 'none';
+  document.getElementById('page1').style.display = 'flex';
+  cBldg = ''; cZone = ''; cIns = ''; state = {};
+  document.querySelectorAll('.sel-card,.ins-card').forEach(function(c) { c.classList.remove('selected'); });
+  showStep(1);
+}
+
+// ── 스와이프 ──
+(function() {
+  var sx = 0, sy = 0;
+  document.addEventListener('touchstart', function(e) {
+    sx = e.touches[0].clientX;
+    sy = e.touches[0].clientY;
+  }, { passive: true });
+  document.addEventListener('touchend', function(e) {
+    var dx = e.changedTouches[0].clientX - sx;
+    var dy = Math.abs(e.changedTouches[0].clientY - sy);
+    if (sx < 25 && dx > 60 && dy < 80) {
+      if (document.getElementById('page2').style.display === 'flex') goPage1();
+      else if (step > 1) goBack();
+    }
+  }, { passive: true });
+})();
+
+// ── Service Worker ──
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./service-worker.js').catch(function() {});
+}
