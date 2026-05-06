@@ -355,12 +355,22 @@ function doSubmit() {
     + (bad.length ? '⚠️ 점검필요' : '✅ 양호') + '</span></div>';
   document.getElementById('ov-done').classList.add('show');
 
-  fetch(PA_URL, {
-    method:  'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body:    JSON.stringify(payload)
-  }).catch(function(e) { console.warn(e); });
-}
+  var payloadStr = JSON.stringify(payload);
+console.log('📦 payload:', JSON.parse(payloadStr)); // ← 추가
+
+fetch(PA_URL, {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: payloadStr
+})
+.then(function(r) {
+  console.log('📬 PA 응답 status:', r.status); // ← 추가
+  return r.text();
+})
+.then(function(t) {
+  console.log('📬 PA 응답 body:', t); // ← 추가
+})
+.catch(function(e) { console.warn(e); });
 
 function resetApp() {
   document.getElementById('ov-done').classList.remove('show');
