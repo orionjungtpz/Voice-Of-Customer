@@ -556,10 +556,8 @@ function fetchStock() {
   var updated = document.getElementById('stock-updated');
   var preview = document.getElementById('adm-stock-preview');
   if(!content) return;
-
-  // range=5d: 장 마감 후에도 당일 종가 데이터 확보
-  var url = 'https://corsproxy.io/?https://query1.finance.yahoo.com/v8/finance/chart/047050.KS?interval=1d&range=5d';
-  fetch(url)
+  var url = 'https://corsproxy.io/?url=' + encodeURIComponent('https://query1.finance.yahoo.com/v8/finance/chart/047050.KS?interval=1d&range=5d');
+  fetch(url, { headers: { 'Accept-Encoding': 'identity' } })
     .then(function(r){ if(!r.ok) throw new Error('http'); return r.json(); })
     .then(function(data) {
       var result = data.chart.result[0];
@@ -569,30 +567,23 @@ function fetchStock() {
       var lows   = result.indicators.quote[0].low    || [];
       var vols   = result.indicators.quote[0].volume || [];
       var timestamps = result.timestamp || [];
-
-      // null 제거 후 마지막 유효값
       function last(arr) { var v = arr.filter(function(x){ return x != null; }); return v[v.length-1]; }
-
       var price = Math.round(last(closes));
       var allC  = closes.filter(function(x){ return x != null; });
       var prev  = allC.length >= 2 ? Math.round(allC[allC.length-2]) : Math.round(meta.chartPreviousClose || price);
       var high  = Math.round(last(highs));
       var low   = Math.round(last(lows));
       var vol   = last(vols) || 0;
-
       if(!price) throw new Error('no data');
-
       var change    = price - prev;
       var changePct = (change / prev * 100).toFixed(2);
       var arrow     = change >= 0 ? '▲' : '▼';
       var color     = change >= 0 ? '#ff6b6b' : '#74b9ff';
       var sign      = change >= 0 ? '+' : '';
-
       var isLive = meta.marketState === 'REGULAR';
       var stateLabel = isLive
         ? '<span style="font-size:10px;color:#4ade80;margin-left:6px;">● 장중</span>'
         : '<span style="font-size:10px;color:rgba(255,255,255,.4);margin-left:6px;">장마감</span>';
-
       content.innerHTML =
         '<div style="display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;">'
         + '<span style="font-size:22px;font-weight:800;color:#fff;">' + price.toLocaleString()
@@ -605,7 +596,6 @@ function fetchStock() {
         + '<span style="font-size:11px;color:rgba(255,255,255,.5);">저 <b style="color:#fff">' + low.toLocaleString() + '</b></span>'
         + '<span style="font-size:11px;color:rgba(255,255,255,.5);">거래량 <b style="color:#fff">' + Math.round(vol/1000) + '천주</b></span>'
         + '</div>';
-
       var lastTs  = timestamps[timestamps.length-1];
       var dateStr = lastTs ? new Date(lastTs*1000).toLocaleDateString('ko-KR',{month:'numeric',day:'numeric'}) : '';
       if(updated) updated.textContent = dateStr ? dateStr + (isLive ? ' 실시간' : ' 종가') : (isLive ? '실시간' : '종가');
