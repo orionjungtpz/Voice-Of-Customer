@@ -371,7 +371,8 @@ fetch(PA_URL, {
   console.log('📬 PA 응답 body:', t); // ← 추가
 })
 .catch(function(e) { console.warn(e); });
-
+}
+  
 function resetApp() {
   document.getElementById('ov-done').classList.remove('show');
   document.getElementById('page2').style.display = 'none';
