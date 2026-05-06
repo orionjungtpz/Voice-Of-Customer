@@ -217,4 +217,109 @@ function uploadZone(zone, input) {
 }
 
 function resetZone(zone) {
-  try { localStorage.removeItem('img_zone_' + cBldg + '_'
+  try { localStorage.removeItem('img_zone_' + cBldg + '_' + zone); } catch(e) {}
+  buildAdmZone();
+}
+
+// ── 관리자: 점검자 ──
+function buildAdmIns() {
+  if (!cZone) { alert('먼저 구역을 선택해주세요'); return; }
+  var ins = ORG[cBldg].zones[cZone].inspectors;
+
+  var textList = document.getElementById('adm-ins-text');
+  if (textList) {
+    textList.innerHTML = ins.map(function(p, idx) {
+      return '<div class="adm-row" style="align-items:center;gap:6px;margin-bottom:8px;" id="insrow' + idx + '">'
+        + '<button class="adm-order-btn" onclick="moveIns(' + idx + ',-1)" title="위로">▲</button>'
+        + '<button class="adm-order-btn" onclick="moveIns(' + idx + ',1)" title="아래로">▼</button>'
+        + '<input class="adm-input" style="margin:0;flex:1;" id="insname' + idx + '" value="' + p + '" placeholder="점검자 이름">'
+        + '<button class="adm-save-btn" onclick="saveInsName(' + idx + ')">저장</button>'
+        + '<button class="adm-del-btn" onclick="delInspector(' + idx + ')" title="삭제">✕</button>'
+        + '</div>';
+    }).join('');
+  }
+
+  var list = document.getElementById('adm-ins');
+  list.innerHTML = '';
+  ins.forEach(function(p) {
+    var src  = localStorage.getItem('img_ins_' + cBldg + '_' + cZone + '_' + p) || '';
+    var row  = document.createElement('div'); row.className = 'adm-row';
+    var thumb = document.createElement('div'); thumb.className = 'adm-thumb'; thumb.style.borderRadius = '50%';
+    thumb.innerHTML = src
+      ? '<img src="' + src + '" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">'
+      : '👤';
+    var info = document.createElement('div'); info.style.flex = '1';
+    var nm   = document.createElement('div');
+    nm.style.cssText = 'font-size:12px;font-weight:700;color:#fff;margin-bottom:6px;';
+    nm.textContent = p;
+    var lbl  = document.createElement('label'); lbl.className = 'adm-btn'; lbl.textContent = '📷 변경';
+    var inp  = document.createElement('input'); inp.type = 'file'; inp.accept = 'image/*'; inp.style.display = 'none';
+    (function(name) { inp.addEventListener('change', function() { uploadIns(name, inp); }); })(p);
+    lbl.appendChild(inp);
+    var rst = document.createElement('button'); rst.className = 'adm-reset'; rst.textContent = '초기화';
+    (function(name) { rst.addEventListener('click', function() { resetIns(name); }); })(p);
+    info.appendChild(nm); info.appendChild(lbl); info.appendChild(rst);
+    row.appendChild(thumb); row.appendChild(info);
+    list.appendChild(row);
+  });
+}
+
+function saveInsName(idx) {
+  if (!cBldg || !cZone) return;
+  var el      = document.getElementById('insname' + idx);
+  if (!el) return;
+  var oldName = ORG[cBldg].zones[cZone].inspectors[idx];
+  var val     = el.value.trim();
+  if (!val) { alert('이름을 입력해주세요.'); return; }
+  var oldKey = 'img_ins_' + cBldg + '_' + cZone + '_' + oldName;
+  var newKey = 'img_ins_' + cBldg + '_' + cZone + '_' + val;
+  try {
+    var img = localStorage.getItem(oldKey);
+    if (img && oldName !== val) {
+      localStorage.setItem(newKey, img);
+      localStorage.removeItem(oldKey);
+    }
+  } catch(e) {}
+  ORG[cBldg].zones[cZone].inspectors[idx] = val;
+  buildAdmIns();
+  alert('✅ 저장되었습니다.');
+}
+
+function addInspector() {
+  if (!cBldg || !cZone) return;
+  var val = document.getElementById('adm-ins-new').value.trim();
+  if (!val) { alert('이름을 입력해주세요.'); return; }
+  ORG[cBldg].zones[cZone].inspectors.push(val);
+  document.getElementById('adm-ins-new').value = '';
+  buildAdmIns();
+}
+
+function delInspector(idx) {
+  if (!cBldg || !cZone) return;
+  var name = ORG[cBldg].zones[cZone].inspectors[idx];
+  if (!confirm('"' + name + '" 점검자를 삭제할까요?')) return;
+  ORG[cBldg].zones[cZone].inspectors.splice(idx, 1);
+  buildAdmIns();
+}
+
+function moveIns(idx, dir) {
+  if (!cBldg || !cZone) return;
+  var arr = ORG[cBldg].zones[cZone].inspectors;
+  var to  = idx + dir;
+  if (to < 0 || to >= arr.length) return;
+  var tmp = arr[idx]; arr[idx] = arr[to]; arr[to] = tmp;
+  buildAdmIns();
+}
+
+function uploadIns(name, input) {
+  if (!input.files[0]) return;
+  compressImg(input.files[0], 400, 0.85, function(src) {
+    try { localStorage.setItem('img_ins_' + cBldg + '_' + cZone + '_' + name, src); } catch(e) {}
+    buildAdmIns();
+  });
+}
+
+function resetIns(name) {
+  try { localStorage.removeItem('img_ins_' + cBldg + '_' + cZone + '_' + name); } catch(e) {}
+  buildAdmIns();
+}
