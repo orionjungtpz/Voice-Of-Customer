@@ -195,10 +195,23 @@ function buildEmailHeader(dt, statusColor, statusText) {
 }
 
 function buildEmailTable(details, KEYS, NAMES) {
+  // Key-Value details를 room 기준으로 그룹핑 (순서 유지)
+  var roomMap   = {};
+  var roomOrder = [];
+  details.forEach(function(d) {
+    if (!roomMap[d.room]) {
+      roomMap[d.room] = { room: d.room, note: d.note, photoUrls: d.photoUrls };
+      roomOrder.push(d.room);
+    }
+    roomMap[d.room][d.itemKey] = d.checked;
+  });
+  var grouped = roomOrder.map(function(r) { return roomMap[r]; });
+
   var headerCells = KEYS.map(function(k) {
     return '<th style="padding:8px;text-align:center;border:1px solid #dde5f4;">' + NAMES[k] + '</th>';
   }).join('');
-  var rows = details.map(function(r, i) {
+
+  var rows = grouped.map(function(r, i) {
     var bg     = i % 2 === 0 ? '#fff' : '#f8faff';
     var rowBad = KEYS.some(function(k) { return r[k] === '미체크'; });
     if (rowBad) bg = '#fff5f5';
@@ -218,6 +231,7 @@ function buildEmailTable(details, KEYS, NAMES) {
       + '<td style="padding:7px 8px;text-align:center;border:1px solid #dde5f4;">' + photoCell + '</td>'
       + '</tr>';
   }).join('');
+
   return '<h3 style="color:#003087;font-size:14px;margin:20px 0 8px;">전체 점검 결과</h3>'
     + '<table style="width:100%;border-collapse:collapse;font-size:13px;">'
     + '<thead><tr style="background:#003087;color:#fff;">'
@@ -229,14 +243,26 @@ function buildEmailTable(details, KEYS, NAMES) {
 }
 
 function buildEmailBadSummary(bad, KEYS, NAMES) {
-  if (!bad.length) return '';
+  // Key-Value bad를 room 기준으로 그룹핑
+  var roomMap   = {};
+  var roomOrder = [];
+  bad.forEach(function(d) {
+    if (!roomMap[d.room]) {
+      roomMap[d.room] = { room: d.room };
+      roomOrder.push(d.room);
+    }
+    roomMap[d.room][d.itemKey] = d.checked;
+  });
+  var grouped = roomOrder.map(function(r) { return roomMap[r]; });
+  if (!grouped.length) return '';
+
   return '<h3 style="color:#ef4444;font-size:14px;margin:20px 0 8px;">⚠️ 미체크 항목</h3>'
     + '<table style="width:100%;border-collapse:collapse;font-size:13px;">'
     + '<thead><tr style="background:#fef2f2;">'
     + '<th style="padding:8px;text-align:left;border:1px solid #fecaca;color:#ef4444;">공간</th>'
     + '<th style="padding:8px;text-align:left;border:1px solid #fecaca;color:#ef4444;">미체크 항목</th>'
     + '</tr></thead><tbody>'
-    + bad.map(function(r) {
+    + grouped.map(function(r) {
       return '<tr><td style="padding:7px 8px;border:1px solid #fecaca;font-weight:bold;">' + r.room + '</td>'
         + '<td style="padding:7px 8px;border:1px solid #fecaca;color:#ef4444;">'
         + KEYS.filter(function(k) { return r[k] === '미체크'; }).map(function(k) { return NAMES[k]; }).join(', ')
@@ -308,27 +334,18 @@ function doSubmit() {
     + '-' + pad(now.getHours()) + pad(now.getMinutes()) + pad(now.getSeconds())
     + '-' + cBldg.replace(/[^a-zA-Z0-9가-힣]/g, '');
 
-  // 동적 KEYS/NAMES
+  // 동적 KEYS/NAMES (구역별 항목 반영)
   var KEYS  = curItems;
   var NAMES = {};
   curItems.forEach(function(it, i) { NAMES[it] = curItemNames[i]; });
 
-  var details     = buildDetails(roomList);
-  var bad         = details.filter(function(r) {
-    return KEYS.some(function(k) { return r[k] === '미체크'; });
-  });
-  var statusColor = bad.length ? '#ef4444' : '#22c55e';
-  var statusText  = bad.length ? '⚠️ 점검필요' : '✅ 양호';
+  var details   = buildDetails(roomList);
 
-  // 이메일 본문에서 bad 중복 제거 (room 기준)
-  var badByRoom = [];
-  var seen = {};
-  details.forEach(function(r) {
-    if (r.checked === '미체크' && !seen[r.room]) {
-      seen[r.room] = true;
-      badByRoom.push(r);
-    }
-  });
+  // 미체크 항목 필터 (Key-Value 구조 기준)
+  var badByRoom = details.filter(function(d) { return d.checked === '미체크'; });
+
+  var statusColor = badByRoom.length ? '#ef4444' : '#22c55e';
+  var statusText  = badByRoom.length ? '⚠️ 점검필요' : '✅ 양호';
 
   var body = buildEmailHeader(dt, statusColor, statusText)
     + buildEmailTable(details, KEYS, NAMES)
@@ -341,7 +358,7 @@ function doSubmit() {
     building:     cBldg,
     zone:         cZone,
     submittedAt:  dt,
-    statusTag:    bad.length ? '점검필요' : '양호',
+    statusTag:    badByRoom.length ? '점검필요' : '양호',
     emailBody:    body,
     managerEmail: MANAGER_EMAIL,
     details:      details
@@ -351,28 +368,17 @@ function doSubmit() {
     '<div class="mir"><span>건물</span><span>' + cBldg + '</span></div>'
     + '<div class="mir"><span>구역</span><span>' + cZone + '</span></div>'
     + '<div class="mir"><span>점검자</span><span>' + cIns + '</span></div>'
-    + '<div class="mir"><span>결과</span><span style="color:' + (bad.length ? '#ef4444' : '#22c55e') + '">'
-    + (bad.length ? '⚠️ 점검필요' : '✅ 양호') + '</span></div>';
+    + '<div class="mir"><span>결과</span><span style="color:' + (badByRoom.length ? '#ef4444' : '#22c55e') + '">'
+    + (badByRoom.length ? '⚠️ 점검필요' : '✅ 양호') + '</span></div>';
   document.getElementById('ov-done').classList.add('show');
 
-  var payloadStr = JSON.stringify(payload);
-console.log('📦 payload:', JSON.parse(payloadStr)); // ← 추가
-
-fetch(PA_URL, {
-  method:  'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body:    payloadStr
-})
-.then(function(r) {
-  console.log('📬 PA 응답 status:', r.status);
-  return r.text();
-})
-.then(function(t) {
-  console.log('📬 PA 응답 body:', t);  // ← 이 줄 결과 확인
-})
-.catch(function(e) { console.warn('❌ fetch 오류:', e); });
+  fetch(PA_URL, {
+    method:  'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body:    JSON.stringify(payload)
+  }).catch(function(e) { console.warn(e); });
 }
-  
+
 function resetApp() {
   document.getElementById('ov-done').classList.remove('show');
   document.getElementById('page2').style.display = 'none';
