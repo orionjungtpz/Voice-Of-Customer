@@ -117,15 +117,27 @@ function selZone(name, el) {
   grid.style.gridTemplateColumns = 'repeat(' + (ins.length >= 3 ? 3 : 2) + ', 1fr)';
   grid.innerHTML = ins.map(function(p) {
     var lsSrc    = localStorage.getItem('img_ins_' + cBldg + '_' + cZone + '_' + p);
-    var photoSrc = 'photos/' + encodeURIComponent(p) + '.jpg';
-    var initials = p.length >= 2 ? p.slice(-2) : p;
-    var av;
-    if (lsSrc) {
-      av = '<img src="' + lsSrc + '" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">';
-    } else {
-      av = '<img src="' + photoSrc + '" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" onerror="this.hidden=true;">'
-        + '<span style="display:none;width:100%;height:100%;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff;">' + initials + '</span>';
-    }
+var photoMap = {
+  '오세림': '1.png',
+  '전승리': '2.png',
+  '권민경': '3.png',
+  '김영은': '4.png',
+  '윤동기': '5.png',
+  '김영민': '6.png',
+  '김상미': '7.png',
+  '고지은': '8.png',
+  '정다인': '9.png',
+  '김진경': '1.png'
+};
+var photoSrc = photoMap[p] || ('photos/' + encodeURIComponent(p) + '.jpg');
+var initials = p.length >= 2 ? p.slice(-2) : p;
+var av;
+if (lsSrc) {
+  av = '<img src="' + lsSrc + '" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">';
+} else {
+  av = '<img src="' + photoSrc + '" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" onerror="this.hidden=true;">'
+    + '<span style="display:none;width:100%;height:100%;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff;">' + initials + '</span>';
+}
     return '<div class="ins-card" onclick="selIns(\'' + p + '\',this)">'
       + '<div class="ins-av" style="overflow:hidden;position:relative;display:flex;align-items:center;justify-content:center;">' + av + '</div>'
       + '<div class="ins-nm">' + p + '</div></div>';
