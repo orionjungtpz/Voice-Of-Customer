@@ -1,5 +1,6 @@
 // ── 전역 상태 ──
 var step = 1, cBldg = '', cBldgIdx = 0, cZone = '', cIns = '';
+var curFloor = '';
 var curItems = [], curItemNames = [], curSeatMap = {}, curRooms = [];
 var state = {}, photoStore = {}, imgStore = {};
 var adminFromStep = 1;
@@ -56,6 +57,16 @@ function showStep(n) {
 
 function goBack() {
   if (step >= 4) { showStep(adminFromStep); return; }
+  // 층 선택 화면에서 뒤로가면 층 초기화 후 step3으로
+  var fw = document.getElementById('floor-select-wrap');
+  if (fw) {
+    fw.remove();
+    curFloor = '';
+    document.getElementById('page2').style.display = 'none';
+    document.getElementById('page1').style.display = 'flex';
+    showStep(3);
+    return;
+  }
   if (step > 1) showStep(step - 1);
 }
 
@@ -134,29 +145,104 @@ function selIns(name, el) {
   document.getElementById('bbn').disabled = false;
 }
 
+// ── 층 선택 화면 ──
+function showFloorSelect(cfg) {
+  document.getElementById('page1').style.display = 'none';
+  document.getElementById('page2').style.display = 'flex';
+  document.getElementById('twrap').style.display = 'none';
+  document.getElementById('wip').style.display   = 'none';
+
+  var existing = document.getElementById('floor-select-wrap');
+  if (existing) existing.remove();
+
+  var wrap = document.createElement('div');
+  wrap.id = 'floor-select-wrap';
+  wrap.style.cssText = 'display:flex;flex-direction:column;align-items:center;gap:16px;padding:24px;width:100%;box-sizing:border-box;';
+
+  var title = document.createElement('div');
+  title.style.cssText = 'font-size:16px;font-weight:700;color:#fff;margin-bottom:8px;text-align:center;';
+  title.textContent = '📋 점검할 구역을 선택하세요';
+  wrap.appendChild(title);
+
+  var grid = document.createElement('div');
+  grid.style.cssText = 'display:grid;grid-template-columns:repeat(2,1fr);gap:12px;width:100%;max-width:320px;';
+
+  var floorIcons = { '8층':'8️⃣', '13층':'🔢', '16층':'🔝', '탕비공간':'☕' };
+
+  cfg.floors.forEach(function(floor) {
+    var btn = document.createElement('div');
+    btn.className = 'sel-card';
+    btn.style.cssText = 'padding:20px;text-align:center;cursor:pointer;';
+    btn.innerHTML = '<div style="font-size:28px;margin-bottom:6px;">' + (floorIcons[floor] || '🏢') + '</div>'
+      + '<div style="font-size:14px;font-weight:700;">' + floor + '</div>';
+    btn.addEventListener('click', function() {
+      curFloor = floor;
+      wrap.remove();
+      goPage2();
+    });
+    grid.appendChild(btn);
+  });
+
+  wrap.appendChild(grid);
+  document.getElementById('page2').appendChild(wrap);
+}
+
 // ── page2 ──
 function goPage2() {
   if (!cIns) return;
   var cfg = ZONE_CONFIG[cZone];
-  var dt  = new Date().toLocaleString('ko-KR', { year:'numeric', month:'long', day:'numeric', hour:'2-digit', minute:'2-digit' });
+
+  // 층 선택이 필요한 구역이고 아직 층 미선택
+  if (cfg && cfg.useFloor && !curFloor) {
+    showFloorSelect(cfg);
+    return;
+  }
+
+  // 활성 설정 결정 (층 선택 여부)
+  var activeCfg = (cfg && cfg.useFloor && curFloor)
+    ? cfg.floorConfig[curFloor]
+    : cfg;
+
+  var dt = new Date().toLocaleString('ko-KR', { year:'numeric', month:'long', day:'numeric', hour:'2-digit', minute:'2-digit' });
   document.getElementById('p2b').textContent = '🏢 ' + cBldg;
-  document.getElementById('p2z').textContent = '📍 ' + cZone;
+  document.getElementById('p2z').textContent = '📍 ' + cZone + (curFloor ? ' · ' + curFloor : '');
   document.getElementById('p2i').textContent = '👤 ' + cIns;
   document.getElementById('p2d').textContent = '📅 ' + dt;
   document.getElementById('page1').style.display = 'none';
   document.getElementById('page2').style.display = 'flex';
-  if (!cfg) {
+
+  if (!activeCfg) {
     document.getElementById('twrap').style.display = 'none';
     document.getElementById('wip').style.display   = 'flex';
   } else {
     document.getElementById('twrap').style.display = '';
     document.getElementById('wip').style.display   = 'none';
-    curItems     = cfg.items;
-    curItemNames = cfg.itemNames;
-    curSeatMap   = cfg.seatMap;
-    curRooms     = cfg.rooms;
+
+    // 해당 구역/층의 모든 항목 합집합 (헤더용)
+    var allItemKeys = [];
+    activeCfg.rooms.forEach(function(g) {
+      g.list.forEach(function(room) {
+        var keys = (activeCfg.roomItems && activeCfg.roomItems[room])
+          ? activeCfg.roomItems[room]
+          : (activeCfg.items || []);
+        keys.forEach(function(k) {
+          if (allItemKeys.indexOf(k) === -1) allItemKeys.push(k);
+        });
+      });
+    });
+
+    curItems     = allItemKeys;
+    curItemNames = allItemKeys.map(function(k) {
+      return (activeCfg.itemNameMap && activeCfg.itemNameMap[k])
+        ? activeCfg.itemNameMap[k]
+        : (activeCfg.itemNames ? activeCfg.itemNames[activeCfg.items ? activeCfg.items.indexOf(k) : -1] : k) || k;
+    });
+    curSeatMap   = activeCfg.seatMap || {};
+    curRooms     = activeCfg.rooms   || [];
+
     state = {};
     Object.keys(photoStore).forEach(function(k) { delete photoStore[k]; });
+
     var thr = document.getElementById('thr');
     thr.innerHTML = '<th>공간</th><th>좌석</th>'
       + '<th style="border-right:2px solid rgba(255,255,255,.4);">전체</th>'
@@ -168,6 +254,9 @@ function goPage2() {
 }
 
 function goPage1() {
+  curFloor = '';
+  var fw = document.getElementById('floor-select-wrap');
+  if (fw) fw.remove();
   document.getElementById('page2').style.display = 'none';
   document.getElementById('page1').style.display = 'flex';
   showStep(3);
@@ -177,14 +266,14 @@ function goPage1() {
 function buildEmailHeader(dt, statusColor, statusText) {
   return '<div style="font-family:Arial,sans-serif;max-width:700px;margin:0 auto;">'
     + '<div style="background:#003087;padding:20px 24px;border-radius:8px 8px 0 0;">'
-    + '<h2 style="color:#fff;margin:0;font-size:18px;">📋 ' + cZone + ' 일일점검 결과</h2>'
+    + '<h2 style="color:#fff;margin:0;font-size:18px;">📋 ' + cZone + (curFloor ? ' · ' + curFloor : '') + ' 일일점검 결과</h2>'
     + '</div>'
     + '<div style="background:#f8faff;padding:20px 24px;border:1px solid #dde5f4;border-top:none;">'
     + '<table style="width:100%;border-collapse:collapse;margin-bottom:16px;">'
     + '<tr><td style="padding:6px 12px;font-weight:bold;color:#6b7280;width:80px;">건물</td>'
     + '<td style="padding:6px 12px;color:#1a2340;">' + cBldg + '</td></tr>'
     + '<tr style="background:#fff;"><td style="padding:6px 12px;font-weight:bold;color:#6b7280;">구역</td>'
-    + '<td style="padding:6px 12px;color:#1a2340;">' + cZone + '</td></tr>'
+    + '<td style="padding:6px 12px;color:#1a2340;">' + cZone + (curFloor ? ' · ' + curFloor : '') + '</td></tr>'
     + '<tr><td style="padding:6px 12px;font-weight:bold;color:#6b7280;">점검자</td>'
     + '<td style="padding:6px 12px;color:#1a2340;">' + cIns + '</td></tr>'
     + '<tr style="background:#fff;"><td style="padding:6px 12px;font-weight:bold;color:#6b7280;">일시</td>'
@@ -219,6 +308,10 @@ function buildEmailTable(details, KEYS, NAMES) {
       ? '<a href="__PHOTO_' + r.room + '__" style="color:#003087;font-size:12px;">📷 보기</a>'
       : '<span style="color:#d1d5db;font-size:12px;">-</span>';
     var itemCells = KEYS.map(function(k) {
+      // 해당 공간에 없는 항목은 '-' 표시
+      if (r[k] === undefined) {
+        return '<td style="padding:7px 8px;text-align:center;border:1px solid #dde5f4;color:#d1d5db;">-</td>';
+      }
       var ok = r[k] === '✓';
       return '<td style="padding:7px 8px;text-align:center;border:1px solid #dde5f4;color:'
         + (ok ? '#22c55e' : '#ef4444') + ';font-weight:bold;">' + (ok ? '✓' : '✗') + '</td>';
@@ -279,21 +372,33 @@ function buildEmailFooter() {
     + '</div></div>';
 }
 
-// ── details 생성 (Key-Value) ──
+// ── details 생성 (Key-Value, 공간별 항목 반영) ──
 function buildDetails(roomList) {
   var rows = [];
+  var cfg = ZONE_CONFIG[cZone];
+  var activeCfg = (cfg && cfg.useFloor && curFloor)
+    ? cfg.floorConfig[curFloor]
+    : cfg;
+
   roomList.forEach(function(room) {
     var rid    = room.replace(/ /g, '-');
     var note   = document.getElementById('note-' + rid);
     var photos = photoStore[rid] || [];
-    curItems.forEach(function(it, i) {
+
+    var roomItemKeys = (activeCfg && activeCfg.roomItems && activeCfg.roomItems[room])
+      ? activeCfg.roomItems[room]
+      : curItems;
+
+    roomItemKeys.forEach(function(it) {
+      var itemName = (activeCfg && activeCfg.itemNameMap && activeCfg.itemNameMap[it])
+        ? activeCfg.itemNameMap[it] : it;
       rows.push({
         summaryId:  '',
         room:       room,
         seat:       String(curSeatMap[room] || '-'),
         itemKey:    it,
-        itemName:   curItemNames[i],
-        checked:    state[room][it] ? '✓' : '미체크',
+        itemName:   itemName,
+        checked:    (state[room] && state[room][it]) ? '✓' : '미체크',
         note:       note ? note.value : '',
         photoUrls:  photos.length ? photos[0] : ''
       });
@@ -308,11 +413,16 @@ function doSubmit() {
 
   // 유효성 검사
   var warns = [];
+  var cfg = ZONE_CONFIG[cZone];
+  var activeCfg = (cfg && cfg.useFloor && curFloor) ? cfg.floorConfig[curFloor] : cfg;
+
   roomList.forEach(function(room) {
     var rid = room.replace(/ /g, '-');
     var ni  = document.getElementById('note-' + rid);
     if (ni) ni.classList.remove('warn');
-    var hasUn = curItems.some(function(it) { return !state[room][it]; });
+    var roomItemKeys = (activeCfg && activeCfg.roomItems && activeCfg.roomItems[room])
+      ? activeCfg.roomItems[room] : curItems;
+    var hasUn = roomItemKeys.some(function(it) { return !state[room] || !state[room][it]; });
     if (hasUn && !(ni && ni.value.trim())) warns.push(room);
   });
   if (warns.length) {
@@ -334,14 +444,15 @@ function doSubmit() {
     + '-' + pad(now.getHours()) + pad(now.getMinutes()) + pad(now.getSeconds())
     + '-' + cBldg.replace(/[^a-zA-Z0-9가-힣]/g, '');
 
-  // 동적 KEYS/NAMES (구역별 항목 반영)
+  // 동적 KEYS/NAMES
   var KEYS  = curItems;
   var NAMES = {};
-  curItems.forEach(function(it, i) { NAMES[it] = curItemNames[i]; });
+  curItems.forEach(function(it) {
+    NAMES[it] = (activeCfg && activeCfg.itemNameMap && activeCfg.itemNameMap[it])
+      ? activeCfg.itemNameMap[it] : it;
+  });
 
   var details   = buildDetails(roomList);
-
-  // 미체크 항목 필터 (Key-Value 구조 기준)
   var badByRoom = details.filter(function(d) { return d.checked === '미체크'; });
 
   var statusColor = badByRoom.length ? '#ef4444' : '#22c55e';
@@ -356,7 +467,7 @@ function doSubmit() {
     summaryId:    summaryId,
     inspector:    cIns,
     building:     cBldg,
-    zone:         cZone,
+    zone:         cZone + (curFloor ? ' · ' + curFloor : ''),
     submittedAt:  dt,
     statusTag:    badByRoom.length ? '점검필요' : '양호',
     emailBody:    body,
@@ -366,7 +477,7 @@ function doSubmit() {
 
   document.getElementById('done-info').innerHTML =
     '<div class="mir"><span>건물</span><span>' + cBldg + '</span></div>'
-    + '<div class="mir"><span>구역</span><span>' + cZone + '</span></div>'
+    + '<div class="mir"><span>구역</span><span>' + cZone + (curFloor ? ' · ' + curFloor : '') + '</span></div>'
     + '<div class="mir"><span>점검자</span><span>' + cIns + '</span></div>'
     + '<div class="mir"><span>결과</span><span style="color:' + (badByRoom.length ? '#ef4444' : '#22c55e') + '">'
     + (badByRoom.length ? '⚠️ 점검필요' : '✅ 양호') + '</span></div>';
@@ -380,6 +491,9 @@ function doSubmit() {
 }
 
 function resetApp() {
+  curFloor = '';
+  var fw = document.getElementById('floor-select-wrap');
+  if (fw) fw.remove();
   document.getElementById('ov-done').classList.remove('show');
   document.getElementById('page2').style.display = 'none';
   document.getElementById('page1').style.display = 'flex';
