@@ -157,7 +157,6 @@ function selIns(name, el) {
   document.getElementById('bbn').disabled = false;
 }
 
-// ── 층 선택 화면 ──
 function showFloorSelect(cfg) {
   document.getElementById('page1').style.display = 'none';
   document.getElementById('page2').style.display = 'flex';
@@ -169,30 +168,37 @@ function showFloorSelect(cfg) {
 
   var wrap = document.createElement('div');
   wrap.id = 'floor-select-wrap';
-  wrap.style.cssText = 'display:flex;flex-direction:column;align-items:center;gap:16px;padding:24px;width:100%;box-sizing:border-box;';
+  wrap.style.cssText = 'width:100%;padding:16px;box-sizing:border-box;';
+
+  // step2 헤더와 동일한 구조
+  var header = document.createElement('div');
+  header.style.cssText = 'font-size:13px;color:rgba(255,255,255,.6);margin-bottom:16px;padding:0 4px;';
+  header.innerHTML = '🏢 <b style="color:#fff;">' + cBldg + '</b>'
+    + ' &nbsp;›&nbsp; 👤 <b style="color:#fff;">' + cIns + '</b>';
+  wrap.appendChild(header);
 
   var title = document.createElement('div');
-  title.style.cssText = 'font-size:16px;font-weight:700;color:#fff;margin-bottom:8px;text-align:center;';
+  title.style.cssText = 'font-size:15px;font-weight:700;color:#fff;margin-bottom:14px;padding:0 4px;';
   title.textContent = '📋 점검할 구역을 선택하세요';
   wrap.appendChild(title);
 
+  // 구역 선택과 동일한 sel-grid 클래스 사용
   var grid = document.createElement('div');
-  grid.style.cssText = 'display:grid;grid-template-columns:repeat(2,1fr);gap:12px;width:100%;max-width:320px;';
+  grid.className = 'sel-grid' + (cfg.floors.length >= 3 ? ' three' : '');
 
   var floorIcons = { '8층':'8️⃣', '13층':'🔢', '16층':'🔝', '탕비공간':'☕' };
 
   cfg.floors.forEach(function(floor) {
-    var btn = document.createElement('div');
-    btn.className = 'sel-card';
-    btn.style.cssText = 'padding:20px;text-align:center;cursor:pointer;';
-    btn.innerHTML = '<div style="font-size:28px;margin-bottom:6px;">' + (floorIcons[floor] || '🏢') + '</div>'
-      + '<div style="font-size:14px;font-weight:700;">' + floor + '</div>';
-    btn.addEventListener('click', function() {
+    var card = document.createElement('div');
+    card.className = 'sel-card';
+    card.innerHTML = '<div class="sel-icon">' + (floorIcons[floor] || '🏢') + '</div>'
+      + '<div class="sel-name">' + floor + '</div>';
+    card.addEventListener('click', function() {
       curFloor = floor;
       wrap.remove();
       goPage2();
     });
-    grid.appendChild(btn);
+    grid.appendChild(card);
   });
 
   wrap.appendChild(grid);
