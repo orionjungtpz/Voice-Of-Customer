@@ -1,25 +1,36 @@
 function buildTable() {
   var tb = document.getElementById('tb');
   tb.innerHTML = '';
+  var cfg = ZONE_CONFIG[cZone];
+  var activeCfg = (cfg && cfg.useFloor && curFloor)
+    ? cfg.floorConfig[curFloor]
+    : cfg;
+
   curRooms.forEach(function(g) {
     var gr  = document.createElement('tr'); gr.className = 'grp';
     var gtd = document.createElement('td');
-    gtd.colSpan   = 3 + curItems.length + 1;
+    gtd.colSpan     = 3 + curItems.length + 1;
     gtd.textContent = '▸ ' + g.group;
     gr.appendChild(gtd); tb.appendChild(gr);
 
     g.list.forEach(function(room) {
+      // 공간별 항목 결정
+      var roomItemKeys = (activeCfg && activeCfg.roomItems && activeCfg.roomItems[room])
+        ? activeCfg.roomItems[room]
+        : curItems;
+
       if (!state[room]) {
         state[room] = {};
-        curItems.forEach(function(it) { state[room][it] = false; });
+        roomItemKeys.forEach(function(it) { state[room][it] = false; });
       }
+
       var rid = room.replace(/ /g, '-');
       var tr  = document.createElement('tr');
 
-      // 공간
+      // 공간명
       var td0 = document.createElement('td');
-      var cfg = ZONE_CONFIG[cZone];
-      td0.textContent = (cfg && cfg.displayName && cfg.displayName[room]) ? cfg.displayName[room] : room;
+      td0.textContent = (activeCfg && activeCfg.displayName && activeCfg.displayName[room])
+        ? activeCfg.displayName[room] : room;
       tr.appendChild(td0);
 
       // 좌석
@@ -27,20 +38,29 @@ function buildTable() {
       td1.textContent = curSeatMap[room] || '-';
       tr.appendChild(td1);
 
-      // 전체
+      // 전체 체크
       var td2    = document.createElement('td');
       td2.style.borderRight = '2px solid var(--bd)';
       var allChk = document.createElement('div');
       allChk.className = 'chk'; allChk.textContent = '✓'; allChk.id = 'all-' + rid;
-      (function(r, ri) { allChk.addEventListener('click', function() { tAll(r, ri, allChk); }); })(room, rid);
+      (function(r, ri, rik) {
+        allChk.addEventListener('click', function() { tAll(r, ri, allChk, rik); });
+      })(room, rid, roomItemKeys);
       td2.appendChild(allChk); tr.appendChild(td2);
 
-      // 항목 체크박스
+      // 항목 체크박스 (curItems 기준으로 열 맞추되 없는 항목은 빈 셀)
       curItems.forEach(function(it) {
         var tdi = document.createElement('td');
+        if (roomItemKeys.indexOf(it) === -1) {
+          tdi.style.background = 'rgba(0,0,0,0.15)';
+          tr.appendChild(tdi);
+          return;
+        }
         var chk = document.createElement('div');
         chk.className = 'chk'; chk.textContent = '✓'; chk.id = 'chk-' + rid + '-' + it;
-        (function(r, ri, i) { chk.addEventListener('click', function() { tOne(r, ri, i, chk); }); })(room, rid, it);
+        (function(r, ri, i, rik) {
+          chk.addEventListener('click', function() { tOne(r, ri, i, chk, rik); });
+        })(room, rid, it, roomItemKeys);
         tdi.appendChild(chk); tr.appendChild(tdi);
       });
 
@@ -70,17 +90,19 @@ function buildTable() {
   });
 }
 
-function tOne(room, rid, it, el) {
+function tOne(room, rid, it, el, roomItemKeys) {
+  var keys = roomItemKeys || curItems;
   state[room][it] = !state[room][it];
   el.classList.toggle('on', state[room][it]);
-  var all = curItems.every(function(i) { return state[room][i]; });
+  var all = keys.every(function(i) { return state[room][i]; });
   var ae  = document.getElementById('all-' + rid);
   if (ae) ae.classList.toggle('on', all);
 }
 
-function tAll(room, rid, el) {
-  var allOn = curItems.every(function(it) { return state[room][it]; });
-  curItems.forEach(function(it) {
+function tAll(room, rid, el, roomItemKeys) {
+  var keys  = roomItemKeys || curItems;
+  var allOn = keys.every(function(it) { return state[room][it]; });
+  keys.forEach(function(it) {
     state[room][it] = !allOn;
     var c = document.getElementById('chk-' + rid + '-' + it);
     if (c) c.classList.toggle('on', !allOn);
