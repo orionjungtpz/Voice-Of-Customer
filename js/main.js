@@ -4,6 +4,7 @@ var curFloor = '';
 var curItems = [], curItemNames = [], curSeatMap = {}, curRooms = [];
 var state = {}, photoStore = {}, imgStore = {};
 var adminFromStep = 1;
+var floorSelectMode = false;
 
 // ── 초기화 ──
 window.onload = function() {
@@ -50,29 +51,49 @@ function showStep(n) {
   } else {
     bar.className = 'bbar show';
     btn.style.display = 'flex';
-    btn.disabled = (n === 2) ? !cZone : !cIns;
+    if (n === 2) {
+      btn.disabled = !cZone;
+    } else if (n === 3) {
+      // 층 선택 모드면 층 선택 여부, 아니면 점검자 선택 여부
+      btn.disabled = floorSelectMode ? !curFloor : !cIns;
+    }
     bbk.style.display = 'flex';
   }
 }
 
 function goBack() {
   if (step >= 4) { showStep(adminFromStep); return; }
-  // 층 선택 화면에서 뒤로가면 층 초기화 후 step3으로
-  var fw = document.getElementById('floor-select-wrap');
-  if (fw) {
-    fw.remove();
+  if (step === 3 && floorSelectMode) {
+    // 층 선택 → 점검자 선택으로 되돌아가기
+    floorSelectMode = false;
     curFloor = '';
-    document.getElementById('page2').style.display = 'none';
-    document.getElementById('page1').style.display = 'flex';
-    showStep(3);
+    showInspectorSelect();
     return;
+  }
+  if (step === 3) {
+    curFloor = '';
+    floorSelectMode = false;
   }
   if (step > 1) showStep(step - 1);
 }
 
 function handleNext() {
   if (step === 2) showStep(3);
-  else if (step === 3) goPage2();
+  else if (step === 3) {
+    if (floorSelectMode) {
+      // 층 선택 완료 → page2로
+      floorSelectMode = false;
+      goPage2();
+    } else {
+      var cfg = ZONE_CONFIG[cZone];
+      if (cfg && cfg.useFloor) {
+        // 층 선택 모드로 전환
+        showFloorSelect(cfg);
+      } else {
+        goPage2();
+      }
+    }
+  }
 }
 
 function goAdmin(fromStep) {
@@ -86,7 +107,7 @@ function goAdmin(fromStep) {
 
 // ── 건물 선택 ──
 function selBldg(name, idx, el) {
-  cBldg = name; cBldgIdx = idx; cZone = ''; cIns = '';
+  cBldg = name; cBldgIdx = idx; cZone = ''; cIns = ''; curFloor = ''; floorSelectMode = false;
   document.querySelectorAll('#bg .sel-card').forEach(function(c) { c.classList.remove('selected'); });
   el.classList.add('selected');
   var zones = ORG[name].zones;
@@ -109,44 +130,81 @@ function selBldg(name, idx, el) {
 
 // ── 구역 선택 ──
 function selZone(name, el) {
-  cZone = name; cIns = '';
+  cZone = name; cIns = ''; curFloor = ''; floorSelectMode = false;
   document.querySelectorAll('#zg .sel-card').forEach(function(c) { c.classList.remove('selected'); });
   el.classList.add('selected');
-  var ins  = ORG[cBldg].zones[name].inspectors;
-  var grid = document.getElementById('ig');
-  grid.style.gridTemplateColumns = 'repeat(' + (ins.length >= 3 ? 3 : 2) + ', 1fr)';
-  grid.innerHTML = ins.map(function(p) {
-    var lsSrc    = localStorage.getItem('img_ins_' + cBldg + '_' + cZone + '_' + p);
-var photoMap = {
-  '오세림': '1.png',
-  '전승리': '2.png',
-  '권민경': '3.png',
-  '김영은': '4.png',
-  '윤동기': '5.png',
-  '김영민': '6.png',
-  '김상미': '7.png',
-  '고지은': '8.png',
-  '정다인': '9.png',
-  '김진경': '1.png'
-};
-var photoSrc = photoMap[p] || ('photos/' + encodeURIComponent(p) + '.jpg');
-var initials = p.length >= 2 ? p.slice(-2) : p;
-var av;
-if (lsSrc) {
-  av = '<img src="' + lsSrc + '" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">';
-} else {
-  av = '<img src="' + photoSrc + '" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" onerror="this.hidden=true;">'
-    + '<span style="display:none;width:100%;height:100%;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff;">' + initials + '</span>';
-}
-    return '<div class="ins-card" onclick="selIns(\'' + p + '\',this)">'
-      + '<div class="ins-av" style="overflow:hidden;position:relative;display:flex;align-items:center;justify-content:center;">' + av + '</div>'
-      + '<div class="ins-nm">' + p + '</div></div>';
-  }).join('');
+  showInspectorSelect();
   document.getElementById('s3b').textContent = cBldg;
   document.getElementById('s3z').textContent = name;
   document.getElementById('bbn').disabled = true;
   document.getElementById('adm-ins-title').textContent = name + ' 점검자 프로필';
   setTimeout(function() { showStep(3); }, 150);
+}
+
+// ── 점검자 선택 UI ──
+function showInspectorSelect() {
+  floorSelectMode = false;
+  var ins  = ORG[cBldg].zones[cZone].inspectors;
+  var grid = document.getElementById('ig');
+  grid.style.gridTemplateColumns = 'repeat(' + (ins.length >= 3 ? 3 : 2) + ', 1fr)';
+  var photoMap = {
+    '오세림': '1.png',
+    '전승리': '2.png',
+    '권민경': '3.png',
+    '김영은': '4.png',
+    '윤동기': '5.png',
+    '김영민': '6.png',
+    '김상미': '7.png',
+    '고지은': '8.png',
+    '정다인': '9.png',
+    '김진경': '1.png'
+  };
+  grid.innerHTML = ins.map(function(p) {
+    var lsSrc    = localStorage.getItem('img_ins_' + cBldg + '_' + cZone + '_' + p);
+    var photoSrc = photoMap[p] || ('photos/' + encodeURIComponent(p) + '.jpg');
+    var initials = p.length >= 2 ? p.slice(-2) : p;
+    var av;
+    if (lsSrc) {
+      av = '<img src="' + lsSrc + '" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">';
+    } else {
+      av = '<img src="' + photoSrc + '" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\';">'
+        + '<span style="display:none;width:100%;height:100%;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff;">' + initials + '</span>';
+    }
+    return '<div class="ins-card" onclick="selIns(\'' + p + '\',this)">'
+      + '<div class="ins-av" style="overflow:hidden;position:relative;display:flex;align-items:center;justify-content:center;">' + av + '</div>'
+      + '<div class="ins-nm">' + p + '</div></div>';
+  }).join('');
+  document.getElementById('bbn').disabled = !cIns;
+}
+
+// ── 층 선택 UI (step3 재활용) ──
+function showFloorSelect(cfg) {
+  floorSelectMode = true;
+  curFloor = '';
+  var grid = document.getElementById('ig');
+  var floorIcons = { '8층':'8️⃣', '13층':'🔢', '16층':'🔝', '탕비공간':'☕' };
+  grid.style.gridTemplateColumns = 'repeat(' + (cfg.floors.length >= 3 ? 3 : 2) + ', 1fr)';
+  grid.innerHTML = cfg.floors.map(function(floor) {
+    return '<div class="ins-card" onclick="selFloor(\'' + floor + '\',this)">'
+      + '<div class="ins-av" style="font-size:28px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.1);border-radius:50%;">'
+      + (floorIcons[floor] || '🏢')
+      + '</div>'
+      + '<div class="ins-nm">' + floor + '</div>'
+      + '</div>';
+  }).join('');
+  // 헤더 텍스트 업데이트
+  document.getElementById('s3b').textContent = cBldg;
+  document.getElementById('s3z').textContent = cZone;
+  document.getElementById('bbn').disabled = true;
+  showStep(3);
+}
+
+// ── 층 선택 ──
+function selFloor(floor, el) {
+  curFloor = floor;
+  document.querySelectorAll('.ins-card').forEach(function(c) { c.classList.remove('selected'); });
+  el.classList.add('selected');
+  document.getElementById('bbn').disabled = false;
 }
 
 // ── 점검자 선택 ──
@@ -157,66 +215,10 @@ function selIns(name, el) {
   document.getElementById('bbn').disabled = false;
 }
 
-function showFloorSelect(cfg) {
-  document.getElementById('page1').style.display = 'none';
-  document.getElementById('page2').style.display = 'flex';
-  document.getElementById('twrap').style.display = 'none';
-  document.getElementById('wip').style.display   = 'none';
-
-  var existing = document.getElementById('floor-select-wrap');
-  if (existing) existing.remove();
-
-  var wrap = document.createElement('div');
-  wrap.id = 'floor-select-wrap';
-  wrap.style.cssText = 'width:100%;padding:16px;box-sizing:border-box;';
-
-  // step2 헤더와 동일한 구조
-  var header = document.createElement('div');
-  header.style.cssText = 'font-size:13px;color:rgba(255,255,255,.6);margin-bottom:16px;padding:0 4px;';
-  header.innerHTML = '🏢 <b style="color:#fff;">' + cBldg + '</b>'
-    + ' &nbsp;›&nbsp; 👤 <b style="color:#fff;">' + cIns + '</b>';
-  wrap.appendChild(header);
-
-  var title = document.createElement('div');
-  title.style.cssText = 'font-size:15px;font-weight:700;color:#fff;margin-bottom:14px;padding:0 4px;';
-  title.textContent = '📋 점검할 구역을 선택하세요';
-  wrap.appendChild(title);
-
-  // 구역 선택과 동일한 sel-grid 클래스 사용
-  var grid = document.createElement('div');
-  grid.className = 'sel-grid' + (cfg.floors.length >= 3 ? ' three' : '');
-
-  var floorIcons = { '8층':'8️⃣', '13층':'🔢', '16층':'🔝', '탕비공간':'☕' };
-
-  cfg.floors.forEach(function(floor) {
-    var card = document.createElement('div');
-    card.className = 'sel-card';
-    card.innerHTML = '<div class="sel-icon">' + (floorIcons[floor] || '🏢') + '</div>'
-      + '<div class="sel-name">' + floor + '</div>';
-    card.addEventListener('click', function() {
-      curFloor = floor;
-      wrap.remove();
-      goPage2();
-    });
-    grid.appendChild(card);
-  });
-
-  wrap.appendChild(grid);
-  document.getElementById('page2').appendChild(wrap);
-}
-
 // ── page2 ──
 function goPage2() {
   if (!cIns) return;
   var cfg = ZONE_CONFIG[cZone];
-
-  // 층 선택이 필요한 구역이고 아직 층 미선택
-  if (cfg && cfg.useFloor && !curFloor) {
-    showFloorSelect(cfg);
-    return;
-  }
-
-  // 활성 설정 결정 (층 선택 여부)
   var activeCfg = (cfg && cfg.useFloor && curFloor)
     ? cfg.floorConfig[curFloor]
     : cfg;
@@ -252,8 +254,7 @@ function goPage2() {
     curItems     = allItemKeys;
     curItemNames = allItemKeys.map(function(k) {
       return (activeCfg.itemNameMap && activeCfg.itemNameMap[k])
-        ? activeCfg.itemNameMap[k]
-        : (activeCfg.itemNames ? activeCfg.itemNames[activeCfg.items ? activeCfg.items.indexOf(k) : -1] : k) || k;
+        ? activeCfg.itemNameMap[k] : k;
     });
     curSeatMap   = activeCfg.seatMap || {};
     curRooms     = activeCfg.rooms   || [];
@@ -273,8 +274,7 @@ function goPage2() {
 
 function goPage1() {
   curFloor = '';
-  var fw = document.getElementById('floor-select-wrap');
-  if (fw) fw.remove();
+  floorSelectMode = false;
   document.getElementById('page2').style.display = 'none';
   document.getElementById('page1').style.display = 'flex';
   showStep(3);
@@ -302,7 +302,6 @@ function buildEmailHeader(dt, statusColor, statusText) {
 }
 
 function buildEmailTable(details, KEYS, NAMES) {
-  // Key-Value details를 room 기준으로 그룹핑 (순서 유지)
   var roomMap   = {};
   var roomOrder = [];
   details.forEach(function(d) {
@@ -326,7 +325,6 @@ function buildEmailTable(details, KEYS, NAMES) {
       ? '<a href="__PHOTO_' + r.room + '__" style="color:#003087;font-size:12px;">📷 보기</a>'
       : '<span style="color:#d1d5db;font-size:12px;">-</span>';
     var itemCells = KEYS.map(function(k) {
-      // 해당 공간에 없는 항목은 '-' 표시
       if (r[k] === undefined) {
         return '<td style="padding:7px 8px;text-align:center;border:1px solid #dde5f4;color:#d1d5db;">-</td>';
       }
@@ -354,7 +352,6 @@ function buildEmailTable(details, KEYS, NAMES) {
 }
 
 function buildEmailBadSummary(bad, KEYS, NAMES) {
-  // Key-Value bad를 room 기준으로 그룹핑
   var roomMap   = {};
   var roomOrder = [];
   bad.forEach(function(d) {
@@ -429,11 +426,11 @@ function buildDetails(roomList) {
 function doSubmit() {
   var roomList = curRooms.flatMap(function(g) { return g.list; });
 
-  // 유효성 검사
-  var warns = [];
   var cfg = ZONE_CONFIG[cZone];
   var activeCfg = (cfg && cfg.useFloor && curFloor) ? cfg.floorConfig[curFloor] : cfg;
 
+  // 유효성 검사
+  var warns = [];
   roomList.forEach(function(room) {
     var rid = room.replace(/ /g, '-');
     var ni  = document.getElementById('note-' + rid);
@@ -462,7 +459,6 @@ function doSubmit() {
     + '-' + pad(now.getHours()) + pad(now.getMinutes()) + pad(now.getSeconds())
     + '-' + cBldg.replace(/[^a-zA-Z0-9가-힣]/g, '');
 
-  // 동적 KEYS/NAMES
   var KEYS  = curItems;
   var NAMES = {};
   curItems.forEach(function(it) {
@@ -510,8 +506,7 @@ function doSubmit() {
 
 function resetApp() {
   curFloor = '';
-  var fw = document.getElementById('floor-select-wrap');
-  if (fw) fw.remove();
+  floorSelectMode = false;
   document.getElementById('ov-done').classList.remove('show');
   document.getElementById('page2').style.display = 'none';
   document.getElementById('page1').style.display = 'flex';
