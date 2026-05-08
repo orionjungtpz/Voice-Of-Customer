@@ -111,8 +111,9 @@ const ZONE_CONFIG = {
     floorConfig: {
       '8층': {
         itemNameMap: {
-          'chair':'의자','light':'조명','TV':'TV','clean':'청결상태'
-        },
+    'chair':'의자','light':'조명','TV':'TV','clean':'청결상태',
+    'desk':'책상','pen':'필기도구','clock':'시계','calendar':'달력','doorlock':'도어락'  // ← 추가
+    },
         rooms: [
           { group:'8층 접견실',    list:['접견실'] },
           { group:'8층 출장임원실', list:['출장임원실'] },
@@ -121,7 +122,7 @@ const ZONE_CONFIG = {
         ],
         roomItems: {
           '접견실':    ['chair','light','clean'],
-          '출장임원실':['chair','light','TV','clean'],
+          '출장임원실':['desk','chair','pen','clock','calendar','doorlock'],
           '1회의실':   ['chair','light','TV','clean'],
           '2회의실':   ['chair','light','TV','clean'],
           '3회의실':   ['chair','light','TV','clean'],
@@ -155,11 +156,12 @@ const ZONE_CONFIG = {
         }
       },
       '16층': {
-        itemNameMap: {
-          'chair':'의자','light':'조명','TV':'TV','clean':'청결상태'
-        },
-        rooms: [
-          { group:'16층 출장임원실', list:['출장임원실'] },
+    itemNameMap: {
+      'chair':'의자','light':'조명','TV':'TV','clean':'청결상태',
+      'desk':'책상','pen':'필기도구','clock':'시계','calendar':'달력','doorlock':'도어락'
+    },
+    roomItems: {
+      '출장임원실':['desk','chair','pen','clock','calendar','doorlock'],
           { group:'16층 회의실',    list:['1회의실','2회의실','3회의실','4회의실','5회의실'] },
           { group:'16층 중회의실',  list:['중회의실'] }
         ],
