@@ -490,7 +490,6 @@ function doSubmit() {
     submittedAt:  dt,
     statusTag:    badByRoom.length ? '점검필요' : '양호',
     emailBody:    body,
-    managerEmail: MANAGER_EMAIL,
     details:      details
   };
 
