@@ -466,14 +466,17 @@ function doSubmit() {
       ? activeCfg.itemNameMap[it] : it;
   });
 
-  var details   = buildDetails(roomList);
-  var badByRoom = details.filter(function(d) { return d.checked === '미체크'; });
+  var allDetails = buildDetails(roomList);
+  var badByRoom  = allDetails.filter(function(d) { return d.checked === '미체크'; });
 
+  // 이메일은 전체, SP payload는 미체크만
+  var details = badByRoom;
   var statusColor = badByRoom.length ? '#ef4444' : '#22c55e';
   var statusText  = badByRoom.length ? '⚠️ 점검필요' : '✅ 양호';
 
+   // 이메일은 전체 details 사용
   var body = buildEmailHeader(dt, statusColor, statusText)
-    + buildEmailTable(details, KEYS, NAMES)
+    + buildEmailTable(allDetails, KEYS, NAMES)
     + buildEmailBadSummary(badByRoom, KEYS, NAMES)
     + buildEmailFooter();
 
