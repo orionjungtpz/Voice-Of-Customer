@@ -1,7 +1,6 @@
 // config.js 맨 위
 const PA_URL = 'https://defaultb9501effd05e4bf18a87898d83f46c.eb.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/6d893f6e53384aecafde81176803d45a/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=B8jsk9sYpiU4ar9h-4QZgShDpRzAviLA2xrPieZ_P1Y';
 const ADMIN_PW = '3692';
-const MANAGER_EMAIL = 'orionjungtpz@poscointl.com';
 const SPLASH_DEFAULT = 'data:image/webp;base64,...'; // 기존 값 유지
 
 const ORG = {
