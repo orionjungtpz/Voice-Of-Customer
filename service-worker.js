@@ -1,4 +1,4 @@
-const CACHE_NAME = 'room-inspection-v1';
+const CACHE_NAME = 'room-inspection-v2';
 const OFFLINE_URL = './room_inspection.html';
 
 const CACHE_ASSETS = [
