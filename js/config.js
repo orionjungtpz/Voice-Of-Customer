@@ -181,23 +181,21 @@ const ZONE_CONFIG = {
       }
     },
     '탕비공간': {
-      itemNameMap: {
-        'coffee':'커피머신','tea':'티백류','cup':'종이컵','etc':'기타'
-      },
-      rooms: [
-        { group:'8층 탕비실',  list:['8층 탕비실'] },
-        { group:'13층 탕비실', list:['13층 탕비실'] },
-        { group:'16층 탕비실', list:['16층 탕비실'] }
-      ],
-      roomItems: {
-        '8층 탕비실':  ['coffee','tea','cup','etc'],
-        '13층 탕비실': ['coffee','tea','cup','etc'],
-        '16층 탕비실': ['coffee','tea','cup','etc']
-      },
-      seatMap: {
-        '8층 탕비실':0,'13층 탕비실':0,'16층 탕비실':0
-      }
-    }
+  itemNameMap: {
+    'coffee':'커피머신','tea':'티백류','cup':'종이컵','etc':'기타'
+  },
+  rooms: [
+    { group:'탕비실', list:['8층 탕비실','13층 탕비실','16층 탕비실'] }
+  ],
+  roomItems: {
+    '8층 탕비실':  ['coffee','tea','cup','etc'],
+    '13층 탕비실': ['coffee','tea','cup','etc'],
+    '16층 탕비실': ['coffee','tea','cup','etc']
+  },
+  seatMap: {
+    '8층 탕비실':0,'13층 탕비실':0,'16층 탕비실':0
+  }
+}
   }
 },
 
