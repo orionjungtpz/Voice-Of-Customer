@@ -105,101 +105,101 @@ const ZONE_CONFIG = {
   },
 
   // ── 사무공간 (층 선택 추가 → floorConfig 사용) ──
-  '사무공간': {
-    useFloor: true,   // ← 층 선택 단계 활성화 플래그
-    floors: ['8층','13층','16층','탕비공간'],
-    floorConfig: {
-      '8층': {
-        itemNameMap: {
-    'chair':'의자','light':'조명','TV':'TV','clean':'청결상태',
-    'desk':'책상','pen':'필기도구','clock':'시계','calendar':'달력','doorlock':'도어락'  // ← 추가
+'사무공간': {
+  useFloor: true,
+  floors: ['8층','13층','16층','탕비공간'],
+  floorConfig: {
+    '8층': {
+      itemNameMap: {
+        'chair':'의자','light':'조명','TV':'TV','clean':'청결상태',
+        'desk':'책상','pen':'필기도구','clock':'시계','calendar':'달력','doorlock':'도어락'
+      },
+      rooms: [
+        { group:'8층 접견실',     list:['접견실'] },
+        { group:'8층 출장임원실', list:['출장임원실'] },
+        { group:'8층 회의실',     list:['1회의실','2회의실','3회의실','4회의실','5회의실','6회의실','7회의실'] },
+        { group:'8층 영상회의실', list:['영상회의실'] }
+      ],
+      roomItems: {
+        '접견실':    ['chair','light','clean'],
+        '출장임원실':['desk','chair','pen','clock','calendar','doorlock','light','TV','clean'],
+        '1회의실':   ['desk','chair','pen','clock','light','TV','clean'],
+        '2회의실':   ['desk','chair','pen','clock','light','TV','clean'],
+        '3회의실':   ['desk','chair','pen','clock','light','TV','clean'],
+        '4회의실':   ['desk','chair','pen','clock','light','TV','clean'],
+        '5회의실':   ['desk','chair','pen','clock','light','TV','clean'],
+        '6회의실':   ['desk','chair','pen','clock','light','TV','clean'],
+        '7회의실':   ['desk','chair','pen','clock','light','TV','clean'],
+        '영상회의실':['chair','light','TV','clean']
+      },
+      seatMap: {
+        '접견실':6,'출장임원실':4,
+        '1회의실':4,'2회의실':6,'3회의실':4,
+        '4회의실':6,'5회의실':6,'6회의실':10,'7회의실':10,
+        '영상회의실':15
+      }
     },
-        rooms: [
-          { group:'8층 접견실',    list:['접견실'] },
-          { group:'8층 출장임원실', list:['출장임원실'] },
-          { group:'8층 회의실',    list:['1회의실','2회의실','3회의실','4회의실','5회의실','6회의실','7회의실'] },
-          { group:'8층 영상회의실', list:['영상회의실'] }
-        ],
-        roomItems: {
-          '접견실':    ['chair','light','clean'],
-          '출장임원실':['desk','chair','pen','clock','calendar','doorlock','light','TV','clean'],
-          '1회의실':   ['desk','chair','pen','clock','light','TV','clean'],
-          '2회의실':   ['desk','chair','pen','clock','light','TV','clean'],
-          '3회의실':   ['desk','chair','pen','clock','light','TV','clean'],
-          '4회의실':   ['desk','chair','pen','clock','light','TV','clean'],
-          '5회의실':   ['desk','chair','pen','clock','light','TV','clean'],
-          '6회의실':   ['desk','chair','pen','clock','light','TV','clean'],
-          '7회의실':   ['desk','chair','pen','clock','light','TV','clean'],
-          '영상회의실':['chair','light','TV','clean']
-        },
-        seatMap: {
-          '접견실':6,'출장임원실':4,
-          '1회의실':4,'2회의실':6,'3회의실':4,
-          '4회의실':6,'5회의실':6,'6회의실':10,'7회의실':10,
-          '영상회의실':15
-        }
+    '13층': {
+      itemNameMap: {
+        'chair':'의자','light':'조명','TV':'TV','clean':'청결상태'
       },
-      '13층': {
-        itemNameMap: {
-          'chair':'의자','light':'조명','TV':'TV','clean':'청결상태'
-        },
-        rooms: [
-          { group:'13층 회의실',     list:['1회의실'] },
-          { group:'13층 다목적회의실',list:['다목적회의실'] }
-        ],
-        roomItems: {
-          '1회의실':    ['chair','light','clean'],
-          '다목적회의실':['chair','light','TV','clean']
-        },
-        seatMap: {
-          '1회의실':6,'다목적회의실':20
-        }
+      rooms: [
+        { group:'13층 회의실',      list:['1회의실'] },
+        { group:'13층 다목적회의실', list:['다목적회의실'] }
+      ],
+      roomItems: {
+        '1회의실':     ['chair','light','clean'],
+        '다목적회의실':['chair','light','TV','clean']
       },
+      seatMap: {
+        '1회의실':6,'다목적회의실':20
+      }
+    },
     '16층': {
-  itemNameMap: {
-    'chair':'의자','light':'조명','TV':'TV','clean':'청결상태',
-    'desk':'책상','pen':'필기도구','clock':'시계','calendar':'달력','doorlock':'도어락'
-  },
-  rooms: [
-    { group:'16층 출장임원실', list:['출장임원실'] },
-    { group:'16층 회의실',    list:['1회의실','2회의실','3회의실','4회의실','5회의실'] },
-    { group:'16층 중회의실',  list:['중회의실'] }
-  ],
-  roomItems: {
-  '출장임원실':['desk','chair','pen','clock','calendar','doorlock','light','TV','clean'],
-  '1회의실':   ['desk','chair','pen','clock','light','TV','clean'],
-  '2회의실':   ['desk','chair','pen','clock','light','TV','clean'],
-  '3회의실':   ['desk','chair','pen','clock','light','TV','clean'],
-  '4회의실':   ['desk','chair','pen','clock','light','TV','clean'],
-  '5회의실':   ['desk','chair','pen','clock','light','TV','clean'],
-  '중회의실':  ['desk','chair','pen','clock','light','TV','clean']
-},
-  },
-  seatMap: {
-    '출장임원실':4,
-    '1회의실':4,'2회의실':6,'3회의실':4,
-    '4회의실':6,'5회의실':6,'중회의실':12
-  }
-},
-      '탕비공간': {
-  itemNameMap: {
-    'coffee':'커피머신','tea':'티백류','cup':'종이컵','etc':'기타'
-  },
-  rooms: [
-    { group:'8층 탕비실',  list:['8층 탕비실'] },
-    { group:'13층 탕비실', list:['13층 탕비실'] },
-    { group:'16층 탕비실', list:['16층 탕비실'] }
-  ],
-  roomItems: {
-    '8층 탕비실':  ['coffee','tea','cup','etc'],
-    '13층 탕비실': ['coffee','tea','cup','etc'],
-    '16층 탕비실': ['coffee','tea','cup','etc']
-  },
-  seatMap: {
-    '8층 탕비실':0,'13층 탕비실':0,'16층 탕비실':0
-  }
+      itemNameMap: {
+        'chair':'의자','light':'조명','TV':'TV','clean':'청결상태',
+        'desk':'책상','pen':'필기도구','clock':'시계','calendar':'달력','doorlock':'도어락'
+      },
+      rooms: [
+        { group:'16층 출장임원실', list:['출장임원실'] },
+        { group:'16층 회의실',    list:['1회의실','2회의실','3회의실','4회의실','5회의실'] },
+        { group:'16층 중회의실',  list:['중회의실'] }
+      ],
+      roomItems: {
+        '출장임원실':['desk','chair','pen','clock','calendar','doorlock','light','TV','clean'],
+        '1회의실':   ['desk','chair','pen','clock','light','TV','clean'],
+        '2회의실':   ['desk','chair','pen','clock','light','TV','clean'],
+        '3회의실':   ['desk','chair','pen','clock','light','TV','clean'],
+        '4회의실':   ['desk','chair','pen','clock','light','TV','clean'],
+        '5회의실':   ['desk','chair','pen','clock','light','TV','clean'],
+        '중회의실':  ['desk','chair','pen','clock','light','TV','clean']
+      },
+      seatMap: {
+        '출장임원실':4,
+        '1회의실':4,'2회의실':6,'3회의실':4,
+        '4회의실':6,'5회의실':6,'중회의실':12
+      }
+    },
+    '탕비공간': {
+      itemNameMap: {
+        'coffee':'커피머신','tea':'티백류','cup':'종이컵','etc':'기타'
+      },
+      rooms: [
+        { group:'8층 탕비실',  list:['8층 탕비실'] },
+        { group:'13층 탕비실', list:['13층 탕비실'] },
+        { group:'16층 탕비실', list:['16층 탕비실'] }
+      ],
+      roomItems: {
+        '8층 탕비실':  ['coffee','tea','cup','etc'],
+        '13층 탕비실': ['coffee','tea','cup','etc'],
+        '16층 탕비실': ['coffee','tea','cup','etc']
+      },
+      seatMap: {
+        '8층 탕비실':0,'13층 탕비실':0,'16층 탕비실':0
+      }
     }
-  },
+  }
+},
 
   // ── SWC포스코 ──
   'SWC포스코': {
