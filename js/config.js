@@ -155,32 +155,31 @@ const ZONE_CONFIG = {
           '1회의실':6,'다목적회의실':20
         }
       },
-      '16층': {
-    itemNameMap: {
-      'chair':'의자','light':'조명','TV':'TV','clean':'청결상태',
-      'desk':'책상','pen':'필기도구','clock':'시계','calendar':'달력','doorlock':'도어락'
-    },
-    roomItems: {
-      '출장임원실':['desk','chair','pen','clock','calendar','doorlock'],
-          { group:'16층 회의실',    list:['1회의실','2회의실','3회의실','4회의실','5회의실'] },
-          { group:'16층 중회의실',  list:['중회의실'] }
-        ],
-        roomItems: {
-          '접견실':    ['chair','light','clean'],
-          '출장임원실':['chair','light','TV','clean'],
-          '1회의실':   ['chair','light','TV','clean'],
-          '2회의실':   ['chair','light','TV','clean'],
-          '3회의실':   ['chair','light','TV','clean'],
-          '4회의실':   ['chair','light','TV','clean'],
-          '5회의실':   ['chair','light','TV','clean'],
-          '중회의실':  ['chair','light','TV','clean']
-        },
-        seatMap: {
-          '접견실':6,'출장임원실':4,
-          '1회의실':4,'2회의실':6,'3회의실':4,
-          '4회의실':6,'5회의실':6,'중회의실':12
-        }
-      },
+    '16층': {
+  itemNameMap: {
+    'chair':'의자','light':'조명','TV':'TV','clean':'청결상태',
+    'desk':'책상','pen':'필기도구','clock':'시계','calendar':'달력','doorlock':'도어락'
+  },
+  rooms: [
+    { group:'16층 출장임원실', list:['출장임원실'] },
+    { group:'16층 회의실',    list:['1회의실','2회의실','3회의실','4회의실','5회의실'] },
+    { group:'16층 중회의실',  list:['중회의실'] }
+  ],
+  roomItems: {
+    '출장임원실':['desk','chair','pen','clock','calendar','doorlock'],
+    '1회의실':   ['chair','light','TV','clean'],
+    '2회의실':   ['chair','light','TV','clean'],
+    '3회의실':   ['chair','light','TV','clean'],
+    '4회의실':   ['chair','light','TV','clean'],
+    '5회의실':   ['chair','light','TV','clean'],
+    '중회의실':  ['chair','light','TV','clean']
+  },
+  seatMap: {
+    '출장임원실':4,
+    '1회의실':4,'2회의실':6,'3회의실':4,
+    '4회의실':6,'5회의실':6,'중회의실':12
+  }
+},
       '탕비공간': {
         itemNameMap: {
           'coffee':'커피머신','tea':'티백류','cup':'종이컵','etc':'기타'
