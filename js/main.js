@@ -408,15 +408,17 @@ function buildDetails(roomList) {
       var itemName = (activeCfg && activeCfg.itemNameMap && activeCfg.itemNameMap[it])
         ? activeCfg.itemNameMap[it] : it;
       rows.push({
-        summaryId:  '',
-        room:       room,
-        seat:       String(curSeatMap[room] || '-'),
-        itemKey:    it,
-        itemName:   itemName,
-        checked:    (state[room] && state[room][it]) ? '✓' : '미체크',
-        note:       note ? note.value : '',
-        photoUrls:  photos.length ? photos[0] : ''
-      });
+  summaryId:  '',
+  building:   cBldg,        // ← 추가
+  zone:       cZone + (curFloor ? ' · ' + curFloor : ''),  // ← 추가
+  room:       room,
+  seat:       String(curSeatMap[room] || '-'),
+  itemKey:    it,
+  itemName:   itemName,
+  checked:    (state[room] && state[room][it]) ? '✓' : '미체크',
+  note:       note ? note.value : '',
+  photoUrls:  photos.length ? photos[0] : ''
+});
     });
   });
   return rows;
