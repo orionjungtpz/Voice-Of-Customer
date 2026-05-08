@@ -122,14 +122,14 @@ const ZONE_CONFIG = {
         ],
         roomItems: {
           '접견실':    ['chair','light','clean'],
-          '출장임원실':['desk','chair','pen','clock','calendar','doorlock'],
-          '1회의실':   ['chair','light','TV','clean'],
-          '2회의실':   ['chair','light','TV','clean'],
-          '3회의실':   ['chair','light','TV','clean'],
-          '4회의실':   ['chair','light','TV','clean'],
-          '5회의실':   ['chair','light','TV','clean'],
-          '6회의실':   ['chair','light','TV','clean'],
-          '7회의실':   ['chair','light','TV','clean'],
+          '출장임원실':['desk','chair','pen','clock','calendar','doorlock','light','TV','clean'],
+          '1회의실':   ['desk','chair','pen','clock','light','TV','clean'],
+          '2회의실':   ['desk','chair','pen','clock','light','TV','clean'],
+          '3회의실':   ['desk','chair','pen','clock','light','TV','clean'],
+          '4회의실':   ['desk','chair','pen','clock','light','TV','clean'],
+          '5회의실':   ['desk','chair','pen','clock','light','TV','clean'],
+          '6회의실':   ['desk','chair','pen','clock','light','TV','clean'],
+          '7회의실':   ['desk','chair','pen','clock','light','TV','clean'],
           '영상회의실':['chair','light','TV','clean']
         },
         seatMap: {
@@ -166,13 +166,14 @@ const ZONE_CONFIG = {
     { group:'16층 중회의실',  list:['중회의실'] }
   ],
   roomItems: {
-    '출장임원실':['desk','chair','pen','clock','calendar','doorlock'],
-    '1회의실':   ['chair','light','TV','clean'],
-    '2회의실':   ['chair','light','TV','clean'],
-    '3회의실':   ['chair','light','TV','clean'],
-    '4회의실':   ['chair','light','TV','clean'],
-    '5회의실':   ['chair','light','TV','clean'],
-    '중회의실':  ['chair','light','TV','clean']
+  '출장임원실':['desk','chair','pen','clock','calendar','doorlock','light','TV','clean'],
+  '1회의실':   ['desk','chair','pen','clock','light','TV','clean'],
+  '2회의실':   ['desk','chair','pen','clock','light','TV','clean'],
+  '3회의실':   ['desk','chair','pen','clock','light','TV','clean'],
+  '4회의실':   ['desk','chair','pen','clock','light','TV','clean'],
+  '5회의실':   ['desk','chair','pen','clock','light','TV','clean'],
+  '중회의실':  ['desk','chair','pen','clock','light','TV','clean']
+},
   },
   seatMap: {
     '출장임원실':4,
@@ -181,17 +182,22 @@ const ZONE_CONFIG = {
   }
 },
       '탕비공간': {
-        itemNameMap: {
-          'coffee':'커피머신','tea':'티백류','cup':'종이컵','etc':'기타'
-        },
-        rooms: [
-          { group:'탕비실', list:['탕비실'] }
-        ],
-        roomItems: {
-          '탕비실': ['coffee','tea','cup','etc']
-        },
-        seatMap: { '탕비실': 0 }
-      }
+  itemNameMap: {
+    'coffee':'커피머신','tea':'티백류','cup':'종이컵','etc':'기타'
+  },
+  rooms: [
+    { group:'8층 탕비실',  list:['8층 탕비실'] },
+    { group:'13층 탕비실', list:['13층 탕비실'] },
+    { group:'16층 탕비실', list:['16층 탕비실'] }
+  ],
+  roomItems: {
+    '8층 탕비실':  ['coffee','tea','cup','etc'],
+    '13층 탕비실': ['coffee','tea','cup','etc'],
+    '16층 탕비실': ['coffee','tea','cup','etc']
+  },
+  seatMap: {
+    '8층 탕비실':0,'13층 탕비실':0,'16층 탕비실':0
+  }
     }
   },
 
