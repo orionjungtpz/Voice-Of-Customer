@@ -1,8 +1,8 @@
 const CACHE_NAME = 'room-inspection-v1';
-const OFFLINE_URL = './room_inspectiontest.html';
+const OFFLINE_URL = './room_inspection.html';
 
 const CACHE_ASSETS = [
-  './room_inspectiontest.html'
+  './room_inspection.html'
 ];
 
 // 설치 시 핵심 파일 캐시
