@@ -1,7 +1,7 @@
 {
   "name": "포스코인터내셔널 시설관리시스템",
   "short_name": "시설관리시스템",
-  "start_url": "./room_inspectiont.html",
+  "start_url": "./room_inspection.html",
   "display": "standalone",
   "background_color": "#003087",
   "theme_color": "#003087",
