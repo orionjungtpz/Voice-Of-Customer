@@ -31,6 +31,8 @@ const ZONE_CONFIG = {
     items:     ['monitor','chair','light','clean'],
     itemNames: ['예약모니터','의자','조명','청결상태'],
     roomItems: {
+      '인터써밋':     ['monitor','chair','light','clean','TV'],
+      '인터스페이스':     ['monitor','chair','light','clean','TV'],
       '접견실':      ['monitor','chair','light','clean'],
       'BIZ 1':      ['monitor','chair','light','clean','TV'],
       'BIZ 2':      ['monitor','chair','light','clean','TV'],
@@ -49,7 +51,6 @@ const ZONE_CONFIG = {
       'BIZ 15':     ['monitor','chair','light','clean','TV'],
       'BIZ 16':     ['monitor','chair','light','clean','TV'],
       'BIZ 17':     ['monitor','chair','light','clean','TV'],
-      'BIZ 18':     ['monitor','chair','light','clean','TV'],
       'TRAINING 1': ['monitor','chair','light','clean','roll'],
       'TRAINING 2': ['monitor','chair','light','clean','roll'],
       'TRAINING 3': ['monitor','chair','light','clean','roll']
@@ -59,16 +60,16 @@ const ZONE_CONFIG = {
       'clean':'청결상태','TV':'TV','roll':'롤스크린'
     },
     seatMap: {
-      '접견실':8,
-      'BIZ 1':12,'BIZ 2':12,'BIZ 3':8,'BIZ 4':8,'BIZ 5':8,
-      'BIZ 6':8,'BIZ 7':10,'BIZ 8':8,'BIZ 9':8,'BIZ 10':8,
-      'BIZ 11':5,'BIZ 12':5,'BIZ 13':10,'BIZ 14':5,
-      'BIZ 15':8,'BIZ 16':8,'BIZ 17':10,'BIZ 18':8,
+      '인터써밋':12,'인터스페이스':40,'접견실':8,
+      'BIZ 1':12,'BIZ 2':8,'BIZ 3':8,'BIZ 4':8,'BIZ 5':8,
+      'BIZ 6':9,'BIZ 7':5,'BIZ 8':8,'BIZ 9':8,'BIZ 10':8,
+      'BIZ 11':5,'BIZ 12':10,'BIZ 13':5,'BIZ 14':8,
+      'BIZ 15':8,'BIZ 16':10,'BIZ 17':8,
       'TRAINING 1':16,'TRAINING 2':16,'TRAINING 3':16
     },
     rooms: [
-      { group:'접견실',        list:['접견실'] },
-      { group:'BIZ ROOM',     list:['BIZ 1','BIZ 2','BIZ 3','BIZ 4','BIZ 5','BIZ 6','BIZ 7','BIZ 8','BIZ 9','BIZ 10','BIZ 11','BIZ 12','BIZ 13','BIZ 14','BIZ 15','BIZ 16','BIZ 17','BIZ 18'] },
+      { group:'접견실',        list:['인터써밋','인터스페이스','접견실'] },
+      { group:'BIZ ROOM',     list:['BIZ 1','BIZ 2','BIZ 3','BIZ 4','BIZ 5','BIZ 6','BIZ 7','BIZ 8','BIZ 9','BIZ 10','BIZ 11','BIZ 12','BIZ 13','BIZ 14','BIZ 15','BIZ 16','BIZ 17'] },
       { group:'TRAINING ROOM', list:['TRAINING 1','TRAINING 2','TRAINING 3'] }
     ]
   },
