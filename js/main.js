@@ -482,6 +482,10 @@ function doSubmit() {
     + buildEmailBadSummary(badByRoom, KEYS, NAMES)
     + buildEmailFooter();
 
+  // 건물별 추가 수신자 병합
+  var extraList = EXTRA_RECIPIENTS[cBldg] || [];
+  var managerEmailList = [MANAGER_EMAIL].concat(extraList).join(';');
+
   var payload = {
     summaryId:    summaryId,
     inspector:    cIns,
@@ -490,7 +494,7 @@ function doSubmit() {
     submittedAt:  dt,
     statusTag:    badByRoom.length ? '점검필요' : '양호',
     emailBody:    body,
-    managerEmail: MANAGER_EMAIL,
+    managerEmail: managerEmailList,
     details:      details
   };
 
