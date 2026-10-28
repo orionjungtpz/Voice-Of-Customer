@@ -25,7 +25,7 @@ const ORG = {
   },
   '그랜드센트럴': {
     zones: {
-      'SWC서울역': { icon: '☕', inspectors: ['정다인', '김진경'] }
+      'SWC서울역': { icon: '☕', inspectors: ['김진경', '박자은'] }
     }
   }
 };
