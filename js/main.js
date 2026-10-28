@@ -156,7 +156,7 @@ function showInspectorSelect() {
     '김영민': '6.png',
     '김상미': '7.png',
     '고지은': '8.png',
-    '정다인': '9.png',
+    '박자은': '9.png',
     '김진경': '1.png'
   };
   grid.innerHTML = ins.map(function(p) {
